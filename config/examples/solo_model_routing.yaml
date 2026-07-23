@@ -1,0 +1,28 @@
+# Solo configuration example — Task routing
+# Copy to config/solo_model_routing.yaml and customize
+
+routing:
+  - level: 1
+    name: "Local Demo"
+    model: "local"
+    use_case: "Demo mode — safe, no external API needed"
+    classifier_keywords:
+      - "demo|test|hello|hi"
+
+  - level: 2
+    name: "Cloud LLM"
+    model: "deepseek-chat"
+    use_case: "General Q&A, explanations"
+    requires_api_key: true
+
+  - level: 3
+    name: "Reasoning"
+    model: "deepseek-flash"
+    use_case: "Code gen, multi-step analysis"
+    requires_api_key: true
+
+  - level: 4
+    name: "Planning"
+    model: "deepseek-pro"
+    use_case: "Complex decisions, architecture"
+    requires_api_key: true

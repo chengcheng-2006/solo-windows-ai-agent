@@ -1,0 +1,54 @@
+name: Feature Request
+description: Suggest an idea for Solo
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an idea! Please check the [Roadmap](https://github.com/chengcheng-2006/solo-windows-ai-agent/blob/main/ROADMAP.md) first to see if this is already planned.
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use Case
+      description: What scenario would this feature help with?
+      placeholder: When I'm working on X, I want Solo to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Current Limitation
+      description: What can't you do with Solo today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: How do you envision this feature working?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk Level
+      description: Could this feature affect system safety?
+      options:
+        - R0 (Read-only, no side effects)
+        - R1 (Read+write within sandbox)
+        - R2 (System modification / external calls)
+        - R3 (Potentially destructive / sensitive)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: external
+    attributes:
+      label: External Operations
+      options:
+        - label: This feature would require external API calls or network access
+        - label: This feature would need an approval gate

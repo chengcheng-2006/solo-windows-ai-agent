@@ -1,0 +1,94 @@
+name: Bug Report
+description: Create a report to help us improve Solo
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+        
+        ⚠️ **Before submitting**: Check that you have removed any API keys, tokens, or personal information from logs and screenshots.
+
+  - type: input
+    id: windows_version
+    attributes:
+      label: Windows Version
+      description: What version of Windows are you running?
+      placeholder: e.g., Windows 11 23H2, Windows 10 22H2
+    validations:
+      required: true
+
+  - type: input
+    id: solo_version
+    attributes:
+      label: Solo Version
+      description: What commit hash or version of Solo?
+      placeholder: e.g., main branch, v0.1.0-alpha
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install_type
+    attributes:
+      label: Installation Type
+      options:
+        - Git clone + manual setup
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: module
+    attributes:
+      label: Affected Module
+      description: Which component is affected?
+      placeholder: e.g., Browser Worker, WeChat Gateway, Computer Use, Agent Team
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce the issue?
+      placeholder: |
+        1. Start Solo with '...'
+        2. Send message '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs (Redacted)
+      description: Please copy-paste relevant logs, with any API keys or personal info removed.
+      placeholder: |
+        [paste redacted logs here]
+        Remember to replace API keys with ***
+        Replace paths like C:\Users\YourName with C:\Users\***
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety Checks
+      options:
+        - label: I have removed all API keys, tokens, and personal information from this report
+          required: true
+        - label: This bug does not involve Computer Use (vision-based GUI control) — if it does, I have noted it below

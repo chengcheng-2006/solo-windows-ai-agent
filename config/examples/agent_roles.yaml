@@ -1,0 +1,23 @@
+# Agent Role Mapping — Example configuration
+# This defines the agent team roles and permissions.
+
+agents:
+  planner:
+    role: "Task planning and decomposition"
+    tools: [read, web_search]
+    risk_ceiling: "R1"
+    
+  reviewer:
+    role: "Plan review and approval"
+    tools: [read]
+    risk_ceiling: "R2"
+    
+  executor:
+    role: "Safe task execution"
+    tools: [read, write, exec]
+    risk_ceiling: "R1"
+    
+  validator:
+    role: "Result verification"
+    tools: [read]
+    risk_ceiling: "R0"

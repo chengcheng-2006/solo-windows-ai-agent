@@ -1,0 +1,34 @@
+# Gitleaks 8.30.1 configuration for OpenClaw-Hermes-Integration.
+# Run from the project root:
+#   gitleaks detect -c .gitleaks.toml --no-git --source . --redact=100
+
+title = "OpenClaw-Hermes-Integration"
+
+[extend]
+useDefault = true
+
+# Gitleaks v8.25+ uses an array of global allowlists. These path expressions
+# match either slash style because the project is scanned on Windows.
+[[allowlists]]
+description = "Generated dependencies, caches, Git metadata, and evidence"
+paths = [
+  '''(?i)(^|[\\/])node_modules([\\/]|$)''',
+  '''(?i)(^|[\\/])\.venv([\\/]|$)''',
+  '''(?i)(^|[\\/])__pycache__([\\/]|$)''',
+  '''(?i)(^|[\\/])\.git([\\/]|$)''',
+  '''(?i)(^|[\\/])evidence([\\/]|$)''',
+  '''(?i)(^|[\\/])backups([\\/]|$)''',
+  '''(?i)(^|[\\/])restore-drill([\\/]|$)''',
+]
+
+# These are checked-in/restored upstream test fixtures and reference corpora,
+# not runtime configuration. Keep this list narrow so backups, restore state,
+# data files, source code, and operational configuration remain in scope.
+[[allowlists]]
+description = "Known upstream fixtures and reference-only corpora"
+paths = [
+  '''(?i)(^|[\\/])hermes-agent[\\/]tests([\\/]|$)''',
+  '''(?i)(^|[\\/])hermes-agent[\\/]website([\\/]|$)''',
+  '''(?i)(^|[\\/])hermes-agent[\\/]optional-skills[\\/]mlops[\\/]training[\\/]unsloth[\\/]references[\\/]llms-(full|txt)\.md$''',
+  '''(?i)(^|[\\/])restore-drill[\\/][^\\/]+[\\/]agents[\\/]codex-worker[\\/]agent[\\/]codex-home[\\/]\.tmp[\\/]plugins([\\/]|$)''',
+]

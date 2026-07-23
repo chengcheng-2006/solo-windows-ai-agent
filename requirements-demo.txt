@@ -1,0 +1,14 @@
+# Solo demo/development requirements
+# Minimal dependencies for running demo tasks
+
+# Core
+pydantic>=2.0.0
+
+# CLI
+typer>=0.9.0
+
+# HTTP (for API services)
+httpx>=0.27.0
+
+# Utilities
+python-dateutil>=2.8.0

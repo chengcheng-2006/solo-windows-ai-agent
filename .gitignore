@@ -1,0 +1,101 @@
+# Node
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+
+# Python
+*.egg-info/
+dist/
+build/
+*.whl
+
+# OS
+Thumbs.db
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+*.jsonl
+
+# SQLite
+*.sqlite
+*.sqlite3
+*.db
+
+# Large binary files
+*.bin
+*.pt
+*.pth
+*.onnx
+*.safetensors
+*.gguf
+*.vhd
+*.vhdx
+
+# Media
+*.mp4
+*.wav
+*.mp3
+
+# Archives
+*.zip
+*.7z
+*.rar
+*.tar
+*.gz
+
+# Credentials
+*.key
+*.pem
+*.pfx
+*.p12
+*.cer
+*.crt
+credentials*
+secrets*
+token*
+session*
+
+# Docker
+docker/data/
+docker/volumes/
+
+# Local data
+data/
+models/
+cache/
+backups/
+backup/
+temp/
+tmp/
+
+# State
+state/
+
+# Private
+evidence/
+private/
+personal/
+
+# Hermes
+hermes-agent/node_modules/
+hermes-agent/.venv/
+hermes-agent/venv/
+hermes-agent/__pycache__/
+hermes-agent/build/
+hermes-agent/dist/
+
+# Test artifacts
+.pytest_cache/
+test-results/

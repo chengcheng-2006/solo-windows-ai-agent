@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or Idea?
+    url: https://github.com/chengcheng-2006/solo-windows-ai-agent/discussions
+    about: Please use Discussions for questions, ideas, and general chat
+  - name: Security Vulnerability
+    url: https://github.com/chengcheng-2006/solo-windows-ai-agent/security/advisories
+    about: Please report security vulnerabilities privately

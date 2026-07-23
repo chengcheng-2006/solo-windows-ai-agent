@@ -1,0 +1,80 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check YAML formatting
+        shell: pwsh
+        run: |
+          $errors = 0
+          Get-ChildItem -Recurse -Filter "*.yaml","*.yml" |
+            Where-Object { $_.FullName -notmatch "node_modules|\.venv|__pycache__|\.git" } |
+            ForEach-Object {
+              try { ConvertFrom-Yaml (Get-Content $_.FullName -Raw) -ErrorAction Stop | Out-Null }
+              catch { Write-Warning "Invalid YAML: $($_.Name)"; $errors++ }
+            }
+          if ($errors -gt 0) { throw "$errors YAML files have syntax errors" }
+
+  python-checks:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements-dev.txt 2>$null
+          pip install pytest pyyaml
+      
+      - name: Python syntax check
+        shell: pwsh
+        run: |
+          $errors = 0
+          Get-ChildItem -Recurse -Filter "*.py" |
+            Where-Object { $_.FullName -notmatch "node_modules|\.venv|__pycache__|\.git|hermes-agent" } |
+            ForEach-Object {
+              try { python -m py_compile $_.FullName 2>&1 | Out-Null }
+              catch { Write-Warning "Syntax error in: $($_.FullName)"; $errors++ }
+            }
+          if ($errors -gt 0) { throw "$errors Python files have syntax errors" }
+
+  secret-scan:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          config-path: .gitleaks.toml
+
+  docs-links:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check documentation links
+        shell: pwsh
+        run: |
+          $errors = 0
+          Get-ChildItem -Recurse -Filter "*.md" -Exclude "node_modules","\.venv" |
+            Select-String -Pattern "\[.*\]\(.*\.md\)" |
+            ForEach-Object {
+              $link = ($_ -replace '.*\(([^)]+\.md)\).*', '$1')
+              if ($link -and -not (Test-Path (Join-Path $PSScriptRoot $link))) {
+                Write-Warning "Broken link: $link in $($_.Path)"
+                $errors++
+              }
+            }
+          if ($errors -gt 0) { Write-Warning "$errors broken documentation links found, but not failing build" }
