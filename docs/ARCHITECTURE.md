@@ -1,10 +1,15 @@
 # Solo Architecture
 
-## Overview
+> ⚠️ **Deprecation Notice (v0.1.1):** This document describes the v0.1.0 production architecture.
+> The v0.1.1 release introduces a simplified `solo` package at `src/solo/` with Lite/Core/Full deployment modes.
+> See `docs/internal/ADR_001_LIGHTWEIGHT_MODES.md` for the new architecture.
+> The existing `src/orchestrator/` and `src/paios/` code is preserved but marked DEPRECATED.
+
+## Overview (v0.1.0 Production)
 
 Solo is a multi-layer personal AI system designed for Windows single-machine deployment. It combines message gateways, AI orchestration, browser/desktop automation, and approval-based safety controls.
 
-## System Topology
+## System Topology (v0.1.0)
 
 ```mermaid
 flowchart TD

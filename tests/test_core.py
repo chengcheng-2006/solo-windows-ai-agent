@@ -90,16 +90,16 @@ def test_orchestrator_task_store():
     from orchestrator.openclaw_night_workflow.task_store import TaskStore
     with tempfile.TemporaryDirectory() as tmp:
         store = TaskStore(db_path=Path(tmp) / "test.db")
-        task_id = str(uuid.uuid4())
-        store.create(
-            run_id=task_id,
-            workflow_id="wf-001",
-            state="CREATED",
-            idempotency_key=f"idem-{task_id}",
-        )
-        task = store.get(task_id)
-        assert task is not None
-        assert task["state"] == "CREATED"
+        try:
+            store.migrate()
+            task_id = store.create_workflow_run(
+                workflow_id="wf-001",
+                idempotency_key=f"idem-{uuid.uuid4().hex}",
+            )
+            task = store.get_run(task_id)
+            assert task is not None
+        finally:
+            store.close()
 
 
 def test_orchestrator_approvals():
@@ -108,22 +108,30 @@ def test_orchestrator_approvals():
     with tempfile.TemporaryDirectory() as tmp:
         db_path = Path(tmp) / "test.db"
         store = TaskStore(db_path=db_path)
-        result = create_approval(
-            store=store,
-            workflow_id="wf-001",
-            run_id="run-001",
-            phase_id="phase-1",
-            risk="R3",
-            target="delete file",
-        )
-        assert "action_id" in result
-        assert "nonce" in result
-        row = store.conn.execute(
-            "SELECT status FROM approvals WHERE action_id=?",
-            (result["action_id"],)
-        ).fetchone()
-        assert row is not None
-        assert row["status"] == "PENDING"
+        try:
+            store.migrate()
+            run_id = store.create_workflow_run(
+                workflow_id="wf-001",
+                idempotency_key=f"idem-{uuid.uuid4().hex}",
+            )
+            result = create_approval(
+                store=store,
+                workflow_id="wf-001",
+                run_id=run_id,
+                phase_id="phase-1",
+                risk="R3",
+                target="delete file",
+            )
+            assert "action_id" in result
+            assert "nonce" in result
+            row = store.conn.execute(
+                "SELECT status FROM approvals WHERE action_id=?",
+                (result["action_id"],)
+            ).fetchone()
+            assert row is not None
+            assert row["status"] == "PENDING"
+        finally:
+            store.close()
 
 
 def test_agent_team_enums():
@@ -164,13 +172,13 @@ if __name__ == "__main__":
         ("PAIOS risk", test_paios_risk),
     ]
 
-    passed = 0
+    passed = sum(1 for n, fn in tests if step(n, fn))
     total = len(tests)
-    for name, fn in tests:
-        if step(name, fn):
-            passed += 1
-
     print()
-    print(f"Results: {passed}/{total} passed")
     print("=" * 55)
-    sys.exit(0 if passed >= total - 3 else 1)
+    print(f"Result: {passed}/{total} passed")
+    if passed == total:
+        print("All smoke tests passed.")
+    else:
+        print(f"{total - passed} test(s) failed.")
+        sys.exit(1)

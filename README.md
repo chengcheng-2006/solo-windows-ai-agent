@@ -48,7 +48,8 @@
 | Windows UI automation worker | 🟡 Beta | `workers/windows_bridge/` |
 | OCR/Vision worker | 🟡 Beta | `workers/vision_worker/` |
 | Watchdog health monitoring | 🟡 Beta | `workers/watchdog/` |
-| Safe demo (file-based task pipeline, no API keys) | ✅ Public | `.\scripts\start_demo.ps1` |
+| Safe demo (file-based task pipeline, no API keys) | ✅ Public | `solo demo safe` (v0.1.1) |
+| VETO demo (R3 risk rejected by safety system) | ✅ Public | `solo demo veto` (v0.1.1) |
 
 ### Available in the private deployment only (not in this repository)
 
@@ -64,15 +65,39 @@
 | Privacy broker | Contains personal data redaction patterns |
 | STT (Faster-Whisper) | Requires model download; not tested on new machines |
 
-## Quick Start
+## Quick Start (v0.1.1 Lite)
 
 ### Prerequisites
+
+- Python 3.11+
+- pip
+
+### Install
+
+```powershelL
+pip install solo-agent
+```
+
+### Run Demo (No API keys required)
+
+```powershell
+solo demo safe    # R0 end-to-end pipeline: 8 steps
+solo demo veto    # R3 high-risk request rejected
+solo doctor       # Environment health check
+solo version      # Show version and mode
+```
+
+All demos run in **Lite mode** — zero API keys, zero Docker, zero Node.js, zero GPU.
+
+---
+
+### Prerequisites (v0.1.0 Legacy)
 
 - Windows 10/11 (64-bit)
 - Python 3.11+
 - PowerShell 5.1+
 
-### 1. Setup
+### 1. Setup (v0.1.0 Legacy)
 
 ```powershell
 git clone https://github.com/chengcheng-2006/solo-windows-ai-agent.git

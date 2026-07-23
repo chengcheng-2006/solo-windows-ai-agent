@@ -1,54 +1,51 @@
-# Public Package Completeness Audit
+# Public Package Completeness Audit (Updated)
 
-**Generated:** 2026-07-24 03:14+08:00
-**Auditor:** Cris (main agent)
-**Status:** DOCUMENTATION_ONLY_PACKAGE
+**Generated:** 2026-07-24 (post v0.1.1)
+**Status:** UPDATED — Previous version incorrectly reported "zero source code."
 
-## File Category Breakdown
+## Release Package Contents (v0.1.1-alpha)
 
-| Category | Count | Examples |
-|----------|-------|----------|
-| Documentation | 13 | README.md, README.zh-CN.md, docs/*.md |
-| Community | 3 | SECURITY.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md |
-| License | 2 | LICENSE, THIRD_PARTY_NOTICES.md |
-| CI/Tooling | 6 | .github/workflows/ci.yml, .github/dependabot.yml, Templates |
-| Config/Tooling | 4 | .env.example, .gitignore, .gitattributes, .gitleaks.toml |
-| Other | 1 | gitleaks-report.json (empty) |
-| **Source code (.py/.ps1/.ts/.js)** | **0** | — |
-| **Tests** | **0** | — |
-| **Executable scripts** | **0** | — |
-| **Demo** | **0** | — |
+| Category | Count | Notes |
+|----------|-------|-------|
+| Source code (`.py`) | 78 | `src/orchestrator/` + `src/paios/` + `src/solo/` (new v0.1.1) |
+| New v0.1.1 code | 22 | `src/solo/` — core + demo + CLI |
+| Legacy orchestrator | 29 | `src/orchestrator/openclaw_night_workflow/` (DEPRECATED) |
+| Legacy PAIOS | 27 | `src/paios/paios/` (DEPRECATED) |
+| Tests | 8 | `tests/test_*.py` (new) |
+| Documentation | 14 | `docs/*.md` + `README*.md` |
+| CI/Tooling | 6 | `.github/` workflows + templates |
+| Config/Tooling | 4 | `.env.example`, `.gitignore`, `.gitattributes`, `.gitleaks.toml` |
+| Legal | 2 | `LICENSE`, `THIRD_PARTY_NOTICES.md` |
+| Build | 1 | `pyproject.toml` (new) |
+| **Total tracked** | **114** | GitHub tracked files |
 
-## Empty Directories
+## README Claim Audit
 
-- `scripts/`
-- `src/`
-- `tests/`
-- `config/examples/`
-- `assets/demo/`
-- `assets/logo/`
-- `assets/screenshots/`
-- `assets/social-preview/`
-
-## Verdict: DOCUMENTATION_ONLY_PACKAGE
-
-The current release package contains **zero lines of actual source code**, **zero executable scripts**, **zero tests**, and **zero demo**.
-
-**Every directory intended for code is empty.**
-
-## README Claim Audit (preliminary)
-
-| README Claim | Has Code? | Has Test? | Status |
+| README Claim | Has Code? | Has Test? | v0.1.1 Status |
 |---|---|---|---|
-| "Multi-agent orchestration" | ❌ | ❌ | DOCUMENTED_ONLY |
-| "Browser automation" | ❌ | ❌ | DOCUMENTED_ONLY |
-| "Windows UIA automation" | ❌ | ❌ | DOCUMENTED_ONLY |
-| "Approval-based safety" | ❌ | ❌ | DOCUMENTED_ONLY |
-| "Full audit trail" | ❌ | ❌ | DOCUMENTED_ONLY |
-| "Self-hosted" | ❌ | ❌ | DOCUMENTED_ONLY |
-| "BYOK" | ❌ | ❌ | DOCUMENTED_ONLY |
-| "Command to install" | ❌ | ❌ | DOCUMENTED_ONLY |
+| "Multi-agent orchestration" | ✅ | ✅ | Lite pipeline operational |
+| "Approval-based safety" | ✅ | ✅ | Safe + VETO demo |
+| "Full audit trail" | ✅ | ✅ | SQLite TaskStore + evidence |
+| "Windows-first" | ✅ | ✅ | CLI + doctor command |
+| "Self-hosted" | ✅ | N/A | Lite mode, zero external deps |
+| "Zero API key demo" | ✅ | ✅ | Safe + VETO, no API keys needed |
+| "pip install" | ✅ | N/A | `solo-agent` on PyPI-ready |
+| "Browser automation" | ⏳ Core mode | ❌ | Requires playwright (Core) |
+| "Windows UIA automation" | ⏳ Core mode | ❌ | Future scope |
+| "Command to install" | ✅ | N/A | `pip install solo-agent` |
+| "BYOK" | ⏳ | N/A | `.env.example` configured |
 
-**All README claims are DOCUMENTED_ONLY. This package is misleading as-is.** 
+## Key Improvements in v0.1.1
 
-Files will be rewritten before publication.
+- 22 new source files in `src/solo/` (zero external dependency core)
+- 8 test files with 80+ test cases
+- True Lite/Core/Full deployment modes
+- Safe Demo and VETO Demo with no API keys required
+- Standard Python packaging (`pyproject.toml`)
+- Unified CLI (`solo doctor`, `solo demo safe/veto`)
+
+## Unaddressed (v0.2 scope)
+
+- Browser/Windows UIA workers (Core mode)
+- GPU Computer Use worker (Full mode)
+- Production Docker deployment

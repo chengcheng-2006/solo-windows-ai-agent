@@ -1,164 +1,122 @@
-# Installation Guide
+# Installation Guide (v0.1.1 Lite)
 
-> **⚠️ Alpha Status**: Solo is currently in active development. Installation requires familiarity with Windows development tools. Expect rough edges.
+> 🚀 **Lite mode install — zero API keys, zero Docker, zero Node.js, zero GPU required.**
 
 ## System Requirements
 
-### Minimum
-- **OS**: Windows 10 22H2+ or Windows 11 (64-bit)
-- **CPU**: 4+ cores (x86-64)
-- **RAM**: 16 GB
-- **Storage**: 10 GB free on C: drive, 50 GB free on D: (or data drive)
-- **PowerShell**: 5.1+ (Windows built-in)
-- **Git**: 2.40+
-- **Node.js**: 18+ (LTS recommended)
+- **OS**: Windows 10/11, Linux, macOS
 - **Python**: 3.11+
+- **pip**: Latest (or use `pipx` for isolated install)
 
-### Recommended
-- **GPU**: NVIDIA with 4+ GB VRAM (for local LLM and vision models)
-- **RAM**: 32 GB
-- **Docker Desktop**: 4.30+ (for infrastructure services)
-- **Disc space**: 100+ GB free on data drive
-
-## Installation Steps
-
-### 1. Clone the Repository
+## Quick Install
 
 ```powershell
-git clone https://github.com/chengcheng-2006/solo-windows-ai-agent.git
-cd solo-windows-ai-agent
+pip install solo-agent
 ```
 
-### 2. Set Up Python Environment
+That's it. The `solo` CLI is immediately available:
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+solo doctor          # Environment health check
+solo demo safe       # Safe Demo: R0 end-to-end pipeline
+solo demo veto       # VETO Demo: R3 rejection demo
+solo version         # Show version
+solo cleanup         # Cleanup demo artifacts
 ```
 
-### 3. Set Up Node.js Dependencies
+## Verify Installation
 
 ```powershell
-npm install
-# or
-pnpm install
+solo doctor
 ```
 
-### 4. Configure API Keys
+Expected output (Lite mode):
+```
+  ✅ Python          3.11.9
+  ✅ Disk Space      45.2 GB free
+  ✅ Write Access    Temp directory writable
+  ⚠️  Node.js         Not found (optional)
+  ⚠️  API Key         Not set (optional)
+```
+
+## Run the Demos
 
 ```powershell
-cp .env.example .env
-notepad .env
+solo demo safe       # 8-step pipeline, real TaskStore + Risk + Policy + Approval + Validator
+solo demo veto       # R3 request → rejected by safety system, 6 security guarantees verified
 ```
 
-You need at least one LLM API key:
-- **DeepSeek API key** — For planning and review agents (recommended)
-- Or **OpenAI API key** — For Codex worker
-- Or set up **Ollama** for fully local operation (limited capability)
+Both demos run in **Lite mode** with no API keys required.
 
-### 5. Run Health Check
+## Optional: Core Mode (add HTTP + browser)
 
 ```powershell
-.\scripts\doctor.ps1
+pip install solo-agent[core]
 ```
 
-The doctor script checks:
-- PowerShell version
-- Git availability
-- Python environment
-- Node.js environment
-- API key configuration
-- Disk space
-- Docker Desktop (optional)
-- Port availability
+Enables:
+- HTTP client (httpx) for API calls
+- Playwright browser automation
 
-### 6. Start Solo
+## Optional: Full Mode (Docker infrastructure)
 
-```powershell
-.\scripts\start.ps1
-```
+Full mode requires:
+- Docker Desktop 4.30+
+- `docker compose` infrastructure (see `infra/`)
 
-### 7. Verify Operation
+## Lite vs Core vs Full
 
-```powershell
-.\scripts\test_smoke.ps1
-```
+| Feature | Lite | Core | Full |
+|---------|------|------|------|
+| pip install | `solo-agent` | `solo-agent[core]` | `solo-agent[full]` |
+| Demo pipelines | ✅ | ✅ | ✅ |
+| CLI (doctor/cleanup) | ✅ | ✅ | ✅ |
+| SQLite persistence | ✅ | ✅ | ✅ |
+| HTTP/API calls | ❌ | ✅ | ✅ |
+| Browser automation | ❌ | ✅ | ✅ |
+| Docker services | ❌ | ❌ | ✅ |
+| GPU Workers | ❌ | ❌ | ✅ |
+| API keys required | ❌ | ✅ (some features) | ✅ |
 
-This runs a basic smoke test:
-- Gateway connectivity
-- Model routing
-- Agent availability
+## Troubleshooting
 
-## Optional: Infrastructure Services
+See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues.
 
-For full functionality (audit trail, event bus, dashboards), start Docker services:
+---
 
-```powershell
-cd infra
-docker compose up -d
-```
+## Legacy Installation (v0.1.0)
 
-This starts:
-- PostgreSQL (task persistence)
-- NATS (event bus)
-- Temporal (workflow orchestration)
-- Prometheus + Grafana (monitoring)
-- Loki + Alloy (log aggregation)
+> ⚠️ The following instructions are for the v0.1.0 production deployment and are **DEPRECATED** in favor of the v0.1.1 Lite install above.
 
-## Optional: Local Models
+### Old Requirements
+- Windows 10/11 (64-bit)
+- Python 3.11+
+- Node.js 18+
+- Git
+- PowerShell 5.1+
+- Docker Desktop 4.30+ (for infrastructure services)
 
-### Ollama (for local text inference)
+### Old Setup Steps
 
-```powershell
-# Install Ollama
-winget install Ollama.Ollama
+1. Clone:
+   ```powershell
+   git clone https://github.com/chengcheng-2006/solo-windows-ai-agent.git
+   cd solo-windows-ai-agent
+   ```
 
-# Pull a model
-ollama pull qwen2.5:7b
-```
+2. Set up Python environment:
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   pip install -r requirements.txt
+   ```
 
-### Faster-Whisper (for voice input)
+3. Set up Node.js:
+   ```powershell
+   npm install
+   ```
 
-```powershell
-pip install faster-whisper
-# Download model: base or small for best speed/accuracy balance
-```
-
-## Stopping Solo
-
-```powershell
-.\scripts\stop.ps1
-```
-
-## Uninstalling
-
-```powershell
-.\scripts\uninstall.ps1
-```
-
-This stops services and removes the configuration directory.
-
-## Verification Checklist
-
-After installation:
-
-- [ ] `.\scripts\doctor.ps1` passes all checks
-- [ ] `.\scripts\start.ps1` starts without errors
-- [ ] `.\scripts\test_smoke.ps1` returns success
-- [ ] Gateway responds on 127.0.0.1:18789
-- [ ] Agent team responds to test messages
-
-## Supported Windows Versions
-
-| Version | Status |
-|---------|--------|
-| Windows 11 23H2+ | ✅ Tested |
-| Windows 10 22H2+ | ✅ Tested |
-| Windows Server 2022 | ❌ Not tested |
-| Windows on ARM | ❌ Not tested |
-| Wine / Linux | ❌ Not supported |
-
-## Common Issues
-
-See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for detailed solutions.
+4. Configure API keys:
+   ```powershell
+   cp .env.example .env
+   ```
