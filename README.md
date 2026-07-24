@@ -69,13 +69,18 @@
 
 ### Prerequisites
 
+- Git
 - Python 3.11+
-- pip
 
-### Install
+### Install from source
 
-```powershelL
-pip install solo-agent
+```powershell
+git clone https://github.com/chengcheng-2006/solo-windows-ai-agent.git
+cd solo-windows-ai-agent
+py -m venv .venv
+.venv\Scripts\Activate.ps1
+py -m pip install --upgrade pip
+py -m pip install .
 ```
 
 ### Run Demo (No API keys required)
@@ -88,6 +93,8 @@ solo version      # Show version and mode
 ```
 
 All demos run in **Lite mode** — zero API keys, zero Docker, zero Node.js, zero GPU.
+
+> 📦 **Future:** `pip install solo-agent` after PyPI publication.
 
 ---
 

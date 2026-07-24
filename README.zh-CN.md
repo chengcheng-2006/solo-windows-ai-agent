@@ -57,13 +57,18 @@ Solo 是一个**面向 Windows 的个人 AI 系统**，通过多智能体流水�
 
 ### 前置条件
 
+- Git
 - Python 3.11+
-- pip
 
-### 安装
+### 从源码安装
 
 ```powershell
-pip install solo-agent
+git clone https://github.com/chengcheng-2006/solo-windows-ai-agent.git
+cd solo-windows-ai-agent
+py -m venv .venv
+.venv\Scripts\Activate.ps1
+py -m pip install --upgrade pip
+py -m pip install .
 ```
 
 ### 运行 Demo（无需 API Key）
@@ -76,6 +81,8 @@ solo version      # 版本和模式信息
 ```
 
 所有 Demo 在 **Lite 模式**下运行——零 API Key、零 Docker、零 Node.js、零 GPU。
+
+> 📦 **将来计划：** 发布到 PyPI 后可通过 `pip install solo-agent` 安装。
 
 ---
 

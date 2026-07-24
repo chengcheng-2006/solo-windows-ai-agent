@@ -69,12 +69,13 @@ def doctor(ctx, json_mode, check_models):
     docker_path = shutil.which("docker")
     _check(checks, "Docker", bool(docker_path), docker_path or "Not found (optional)")
 
-    has_deepseek = bool(os.environ.get("DEEPSEEK_API_KEY", "").strip())
-    _check(checks, "API Key", not has_deepseek,
-           "Configured" if has_deepseek else "Not set (optional)")
-
-    # Mode report
+    # Credential check (via mode_report for consistency)
     report = detect_mode_report()
+    creds = report["model_credentials"]
+    _check(checks, "API Key", not creds["any_configured"],
+           ", ".join(creds["providers"]) if creds["any_configured"] else "Not set (optional)")
+
+    # Mode report (already loaded above for cred check)
     _check(checks, "Lite Readiness", report["lite_readiness"], "Ready")
 
     pass_count = sum(1 for c in checks if c["status"] == "PASS")
@@ -88,7 +89,14 @@ def doctor(ctx, json_mode, check_models):
         click.echo(_json.dumps({
             "checks": checks,
             "summary": {"pass": pass_count, "fail": fail_count, "warn": warn_count},
-            "mode_report": report,
+            "mode_report": {
+                "requested_mode": report["requested_mode"],
+                "active_mode": report["active_mode"],
+                "lite_readiness": report["lite_readiness"],
+                "optional_capabilities": report["optional_capabilities"],
+                "model_credentials": report["model_credentials"],
+                "full_mode_readiness": report["full_mode_readiness"],
+            },
             "help": help_text,
         }, indent=2))
     else:
@@ -106,6 +114,9 @@ def doctor(ctx, json_mode, check_models):
         click.echo(f"    Lite Readiness: {'Ready' if report['lite_readiness'] else 'Not ready'}")
         caps = report.get("optional_capabilities", [])
         click.echo(f"    Optional:       {', '.join(caps) if caps else '(none)'}")
-        click.echo(f"    Full Readiness: {report['full_mode_readiness']}")
+        creds = report.get("model_credentials", {})
+        click.echo(f"    Model Creds:    {'Yes (' + ', '.join(creds.get('providers',[])) + ')' if creds.get('any_configured') else 'None'}")
+        fr = report.get("full_mode_readiness", {})
+        click.echo(f"    Full Readiness: docker={fr.get('docker')} node={fr.get('node')} gpu={fr.get('gpu')} api_keys={fr.get('api_keys')} ready={fr.get('ready')}")
         click.echo("")
         click.echo(f"  {help_text}")

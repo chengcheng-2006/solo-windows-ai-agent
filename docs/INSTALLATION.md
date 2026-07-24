@@ -5,16 +5,21 @@
 ## System Requirements
 
 - **OS**: Windows 10/11, Linux, macOS
+- **Git**
 - **Python**: 3.11+
-- **pip**: Latest (or use `pipx` for isolated install)
 
-## Quick Install
+## Install from Source
 
 ```powershell
-pip install solo-agent
+git clone https://github.com/chengcheng-2006/solo-windows-ai-agent.git
+cd solo-windows-ai-agent
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+py -m pip install --upgrade pip
+py -m pip install .
 ```
 
-That's it. The `solo` CLI is immediately available:
+The `solo` CLI is immediately available after install:
 
 ```powershell
 solo doctor          # Environment health check
@@ -24,6 +29,23 @@ solo version         # Show version
 solo cleanup         # Cleanup demo artifacts
 ```
 
+## Developer Install
+
+For development (with test and build tools):
+
+```powershell
+py -m pip install -e ".[dev]"
+```
+
+## Run the Demos
+
+```powershell
+solo demo safe       # 8-step pipeline, real TaskStore + Risk + Policy + Approval + Validator
+solo demo veto       # R3 request -> rejected by safety system, 6 security guarantees verified
+```
+
+Both demos run in **Lite mode** with no API keys required.
+
 ## Verify Installation
 
 ```powershell
@@ -32,26 +54,25 @@ solo doctor
 
 Expected output (Lite mode):
 ```
-  ✅ Python          3.11.9
-  ✅ Disk Space      45.2 GB free
-  ✅ Write Access    Temp directory writable
-  ⚠️  Node.js         Not found (optional)
-  ⚠️  API Key         Not set (optional)
+===== Result: 6 pass, 0 fail, 2 warn =====
+  Mode Report:
+    Requested:      auto
+    Active:         lite
+    Lite Readiness: Ready
 ```
 
-## Run the Demos
+## Future: PyPI Install
+
+After publication on PyPI:
 
 ```powershell
-solo demo safe       # 8-step pipeline, real TaskStore + Risk + Policy + Approval + Validator
-solo demo veto       # R3 request → rejected by safety system, 6 security guarantees verified
+pip install solo-agent
 ```
-
-Both demos run in **Lite mode** with no API keys required.
 
 ## Optional: Core Mode (add HTTP + browser)
 
 ```powershell
-pip install solo-agent[core]
+py -m pip install ".[core]"
 ```
 
 Enables:
@@ -63,12 +84,14 @@ Enables:
 Full mode requires:
 - Docker Desktop 4.30+
 - `docker compose` infrastructure (see `infra/`)
+- GPU with 4+ GB VRAM (for Computer Use worker)
+- API keys for LLM providers
 
 ## Lite vs Core vs Full
 
 | Feature | Lite | Core | Full |
 |---------|------|------|------|
-| pip install | `solo-agent` | `solo-agent[core]` | `solo-agent[full]` |
+| pip install | `solo-agent` (base) | `solo-agent[core]` | `solo-agent[full]` |
 | Demo pipelines | ✅ | ✅ | ✅ |
 | CLI (doctor/cleanup) | ✅ | ✅ | ✅ |
 | SQLite persistence | ✅ | ✅ | ✅ |
@@ -86,7 +109,7 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues.
 
 ## Legacy Installation (v0.1.0)
 
-> ⚠️ The following instructions are for the v0.1.0 production deployment and are **DEPRECATED** in favor of the v0.1.1 Lite install above.
+> The following instructions are for the v0.1.0 production deployment and are **DEPRECATED** in favor of the v0.1.1 Lite install above.
 
 ### Old Requirements
 - Windows 10/11 (64-bit)
@@ -95,28 +118,3 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues.
 - Git
 - PowerShell 5.1+
 - Docker Desktop 4.30+ (for infrastructure services)
-
-### Old Setup Steps
-
-1. Clone:
-   ```powershell
-   git clone https://github.com/chengcheng-2006/solo-windows-ai-agent.git
-   cd solo-windows-ai-agent
-   ```
-
-2. Set up Python environment:
-   ```powershell
-   python -m venv .venv
-   .\.venv\Scripts\Activate.ps1
-   pip install -r requirements.txt
-   ```
-
-3. Set up Node.js:
-   ```powershell
-   npm install
-   ```
-
-4. Configure API keys:
-   ```powershell
-   cp .env.example .env
-   ```

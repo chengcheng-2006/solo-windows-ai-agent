@@ -40,6 +40,15 @@ def test_doctor_json(runner):
     assert "mode_report" in data
     assert data["mode_report"]["active_mode"] == "lite"
     assert data["mode_report"]["lite_readiness"] is True
+    assert "model_credentials" in data["mode_report"]
+    assert "any_configured" in data["mode_report"]["model_credentials"]
+    assert "providers" in data["mode_report"]["model_credentials"]
+    fm = data["mode_report"]["full_mode_readiness"]
+    assert "docker" in fm
+    assert "node" in fm
+    assert "gpu" in fm
+    assert "api_keys" in fm
+    assert "ready" in fm
     assert data["summary"]["pass"] >= 0
 
 
