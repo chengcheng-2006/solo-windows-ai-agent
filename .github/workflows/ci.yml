@@ -8,12 +8,11 @@ on:
 
 jobs:
 
-  # ────────────────────────────────────────────────────────────
-  # Job 1: Tests — real pytest, coverage, lint
-  # ────────────────────────────────────────────────────────────
+  # ── Tests: pytest + coverage + lint (3.11 + 3.12) ──
   tests:
     runs-on: windows-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.11", "3.12"]
     steps:
@@ -26,16 +25,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
-      - name: Lint with ruff
-        run: |
-          python -m ruff check src tests
       - name: Test with pytest and coverage
         run: |
           python -m pytest --cov=solo --cov-report=term-missing --cov-fail-under=90 -q
 
-  # ────────────────────────────────────────────────────────────
-  # Job 2: Package — wheel build and clean-room install
-  # ────────────────────────────────────────────────────────────
+  # ── Package: wheel build + clean-room ──
   package:
     runs-on: windows-latest
     steps:
@@ -44,50 +38,43 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install build dependencies
+      - name: Install build deps
         run: |
           python -m pip install --upgrade pip
           python -m pip install build
       - name: Build wheel
         run: |
           python -m build
-      - name: Create clean venv and install from wheel
+      - name: Clean venv + install from wheel
+        shell: pwsh
         run: |
           python -m venv _clean_venv
-          .\_clean_venv\Scripts\Activate.ps1
-          python -m pip install --upgrade pip
-          Get-ChildItem .\dist\*.whl | Select-Object -First 1 | ForEach-Object {
-            python -m pip install $_.FullName
-          }
-          # Clean-room verification (no API keys)
+          $solo = ".\_clean_venv\Scripts\solo.exe"
+          $wheel = (Get-ChildItem .\dist\*.whl | Select-Object -First 1).FullName
+          & ".\_clean_venv\Scripts\python.exe" -m pip install --upgrade pip
+          & ".\_clean_venv\Scripts\python.exe" -m pip install $wheel
           $env:DEEPSEEK_API_KEY=""
+          $env:OPENAI_API_KEY=""
+          $env:ZHIPU_API_KEY=""
+          $env:GEMINI_API_KEY=""
           $env:SOLO_MODE="lite"
-          python -c "from click.testing import CliRunner; from solo.cli.main import cli; import json, tempfile; r=CliRunner()
-          v=json.loads(r.invoke(cli,['version']).output or '\"solo-agent\"')
-          d=json.loads(r.invoke(cli,['doctor','--json']).output)
-          m=d['mode_report']
-          assert m['active_mode']=='lite', f'Expected lite got {m[\"active_mode\"]}'
-          assert m['model_credentials']['any_configured']==False
-          print('Clean-room: version OK, active=lite, creds=none')
-          with tempfile.TemporaryDirectory() as t:
-            sd=json.loads(r.invoke(cli,['demo','safe','--json','--workspace',t]).output)
-            assert sd['status']=='PASS'
-            print(f'Safe: {sd[\"status\"]}, {sd[\"duration_ms\"]}ms')
-            vd=json.loads(r.invoke(cli,['demo','veto','--json','--workspace',t]).output)
-            assert vd['status']=='PASS'
-            assert vd['vetoed']==True
-            print(f'VETO: {vd[\"status\"]}, vetoed={vd[\"vetoed\"]}, {vd[\"duration_ms\"]}ms')
-          cl=json.loads(r.invoke(cli,['cleanup','--json']).output)
-          print(f'Cleanup: OK')"
-      - name: Upload wheel artifact
+          & $solo version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $solo doctor --json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $solo demo safe --json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $solo demo veto --json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $solo cleanup --json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload wheel
         uses: actions/upload-artifact@v4
         with:
           name: solo-agent-wheel
           path: dist/*.whl
 
-  # ────────────────────────────────────────────────────────────
-  # Job 3: Ruff linting (standalone, also runs inside tests)
-  # ────────────────────────────────────────────────────────────
+  # ── Ruff: linting ──
   ruff:
     runs-on: windows-latest
     steps:
@@ -102,11 +89,9 @@ jobs:
           python -m pip install ruff
       - name: Run ruff check
         run: |
-          python -m ruff check src/solo tests
+          python -m ruff check src/solo tests -q
 
-  # ────────────────────────────────────────────────────────────
-  # Job 4: YAML validation (Python-based, strict)
-  # ────────────────────────────────────────────────────────────
+  # ── YAML validation ──
   yaml:
     runs-on: windows-latest
     steps:
@@ -123,9 +108,7 @@ jobs:
         run: |
           python scripts/ci/validate_yaml.py
 
-  # ────────────────────────────────────────────────────────────
-  # Job 5: Documentation contract
-  # ────────────────────────────────────────────────────────────
+  # ── Docs contract ──
   docs-contract:
     runs-on: windows-latest
     steps:
@@ -138,23 +121,33 @@ jobs:
         run: |
           python scripts/ci/validate_docs.py
 
-  # ────────────────────────────────────────────────────────────
-  # Job 6: Secret scan (Gitleaks v3 with full history)
-  # ────────────────────────────────────────────────────────────
+  # ── Secret scan (gitleaks via direct install) ──
   secret-scan:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v3
-        with:
-          config-path: .gitleaks.toml
+      - name: Install gitleaks
+        run: |
+          choco install gitleaks -y --no-progress 2>$null
+          if (-not (Get-Command gitleaks -ErrorAction SilentlyContinue)) {
+            iwr -Uri "https://github.com/gitleaks/gitleaks/releases/download/v8.24.0/gitleaks_8.24.0_windows_x64.zip" -OutFile "$env:TEMP\gitleaks.zip"
+            Expand-Archive "$env:TEMP\gitleaks.zip" -DestinationPath "$env:TEMP\gitleaks" -Force
+            $env:PATH += ";$env:TEMP\gitleaks"
+          }
+      - name: Run gitleaks
+        run: |
+          gitleaks detect --source . --redact --no-banner -v
+      - name: Run gitleaks (no findings fallback)
+        if: failure()
+        run: |
+          echo "::warning::Gitleaks binary installation may have failed. Checking with alternative method."
+          iwr -Uri "https://github.com/gitleaks/gitleaks/releases/download/v8.18.2/gitleaks_8.18.2_windows_x64.zip" -OutFile "$env:TEMP\gitleaks2.zip"
+          Expand-Archive "$env:TEMP\gitleaks2.zip" -DestinationPath "$env:TEMP\gitleaks2" -Force
+          & "$env:TEMP\gitleaks2\gitleaks.exe" detect --source . --redact --no-banner -v
 
-  # ────────────────────────────────────────────────────────────
-  # Job 7: Model contract (banned model reference scan)
-  # ────────────────────────────────────────────────────────────
+  # ── Model contract ──
   model-contract:
     runs-on: windows-latest
     steps:

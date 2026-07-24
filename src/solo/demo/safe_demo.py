@@ -139,7 +139,7 @@ def run_safe_demo(workspace: Path) -> dict[str, Any]:
     # Export evidence manifest
     evidence_dir = workspace / "evidence"
     evidence_dir.mkdir(parents=True, exist_ok=True)
-    manifest = export_file_manifest(workspace, evidence_dir / "demo_file_manifest.json")
+    export_file_manifest(workspace, evidence_dir / "demo_file_manifest.json")
 
     store.close()
 

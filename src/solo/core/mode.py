@@ -63,11 +63,7 @@ def _is_valid_credential(value: str | None) -> bool:
         if pattern in val_upper:
             return False
 
-    # Check for common config path patterns (e.g., /path/to/key, secret://)
-    if val.startswith("/") or val.startswith("secret://") or val.startswith("file://"):
-        return False
-
-    return True
+    return not (val.startswith("/") or val.startswith("secret://") or val.startswith("file://"))
 
 
 def _check_provider_credential(env_var: str, provider_id: str) -> dict[str, Any]:

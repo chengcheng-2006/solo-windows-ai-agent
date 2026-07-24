@@ -47,10 +47,10 @@ def version() -> None:
 
 
 # Import and register subcommands
-from .cleanup import cleanup
-from .demo import demo
-from .doctor import doctor
-from .test_cmd import test
+from .cleanup import cleanup  # noqa: E402
+from .demo import demo  # noqa: E402
+from .doctor import doctor  # noqa: E402
+from .test_cmd import test  # noqa: E402
 
 cli.add_command(doctor)
 cli.add_command(demo)

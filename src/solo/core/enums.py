@@ -4,7 +4,7 @@ from __future__ import annotations
 from enum import Enum
 
 
-class TaskState(str, Enum):
+class TaskState(str, Enum):  # noqa: UP042
     """Workflow task states — aligned with 三省六部 approval pipeline."""
 
     RECEIVED = "RECEIVED"
@@ -19,7 +19,7 @@ class TaskState(str, Enum):
     COMPLETED = "COMPLETED"
 
 
-class RiskLevel(str, Enum):
+class RiskLevel(str, Enum):  # noqa: UP042
     """Risk classification levels — matching PAIOS risk taxonomy."""
 
     R0 = "R0"  # Read-only, no side effects
@@ -28,7 +28,7 @@ class RiskLevel(str, Enum):
     R3 = "R3"  # High risk or irreversible, requires step-level approval
 
 
-class ApprovalState(str, Enum):
+class ApprovalState(str, Enum):  # noqa: UP042
     """Approval lifecycle states."""
 
     PENDING = "PENDING"
@@ -37,14 +37,14 @@ class ApprovalState(str, Enum):
     EXPIRED = "EXPIRED"
 
 
-class ApprovalDecision(str, Enum):
+class ApprovalDecision(str, Enum):  # noqa: UP042
     """Reviewer decision values."""
 
     APPROVE = "approve"
     REJECT = "reject"
 
 
-class ValidationStatus(str, Enum):
+class ValidationStatus(str, Enum):  # noqa: UP042
     """Validation result status."""
 
     PASS = "PASS"
@@ -52,7 +52,7 @@ class ValidationStatus(str, Enum):
     BLOCKED = "BLOCKED"
 
 
-class DeploymentMode(str, Enum):
+class DeploymentMode(str, Enum):  # noqa: UP042
     """Solo deployment tiers — progressive capability levels."""
 
     LITE = "lite"  # Pure Python, zero external deps

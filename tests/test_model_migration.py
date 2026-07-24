@@ -10,7 +10,6 @@ from pathlib import Path
 
 import pytest
 
-
 SOLO_ROOT = Path(__file__).resolve().parent.parent
 SOLO_SRC = SOLO_ROOT / "src" / "solo"
 
