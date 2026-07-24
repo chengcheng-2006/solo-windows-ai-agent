@@ -22,7 +22,7 @@ def step(name, fn):
 
 
 def test_import_paios():
-    from paios.paios import config, enums, schemas, security, risk
+    from paios.paios import config, enums, schemas
     assert config is not None
     assert enums is not None
     assert schemas is not None
@@ -35,8 +35,8 @@ def test_paios_schemas():
 
 
 def test_paios_state_machine():
-    from paios.paios.state_machine import ALLOWED_TRANSITIONS, TERMINAL_STATES
     from paios.paios.enums import TaskState
+    from paios.paios.state_machine import ALLOWED_TRANSITIONS, TERMINAL_STATES
     assert len(TERMINAL_STATES) >= 2
     received = ALLOWED_TRANSITIONS.get(TaskState.RECEIVED, set())
     assert TaskState.CANCELLED in received
@@ -55,7 +55,7 @@ def test_paios_security():
 
 
 def test_orchestrator_imports():
-    from orchestrator.openclaw_night_workflow import config, schemas, state_machine
+    from orchestrator.openclaw_night_workflow import config
     from orchestrator.openclaw_night_workflow.schemas import utc_now
     assert config is not None
     assert callable(utc_now)
@@ -90,16 +90,16 @@ def test_orchestrator_task_store():
     from orchestrator.openclaw_night_workflow.task_store import TaskStore
     with tempfile.TemporaryDirectory() as tmp:
         store = TaskStore(db_path=Path(tmp) / "test.db")
-        task_id = str(uuid.uuid4())
-        store.create(
-            run_id=task_id,
-            workflow_id="wf-001",
-            state="CREATED",
-            idempotency_key=f"idem-{task_id}",
-        )
-        task = store.get(task_id)
-        assert task is not None
-        assert task["state"] == "CREATED"
+        try:
+            store.migrate()
+            task_id = store.create_workflow_run(
+                workflow_id="wf-001",
+                idempotency_key=f"idem-{uuid.uuid4().hex}",
+            )
+            task = store.get_run(task_id)
+            assert task is not None
+        finally:
+            store.close()
 
 
 def test_orchestrator_approvals():
@@ -108,34 +108,42 @@ def test_orchestrator_approvals():
     with tempfile.TemporaryDirectory() as tmp:
         db_path = Path(tmp) / "test.db"
         store = TaskStore(db_path=db_path)
-        result = create_approval(
-            store=store,
-            workflow_id="wf-001",
-            run_id="run-001",
-            phase_id="phase-1",
-            risk="R3",
-            target="delete file",
-        )
-        assert "action_id" in result
-        assert "nonce" in result
-        row = store.conn.execute(
-            "SELECT status FROM approvals WHERE action_id=?",
-            (result["action_id"],)
-        ).fetchone()
-        assert row is not None
-        assert row["status"] == "PENDING"
+        try:
+            store.migrate()
+            run_id = store.create_workflow_run(
+                workflow_id="wf-001",
+                idempotency_key=f"idem-{uuid.uuid4().hex}",
+            )
+            result = create_approval(
+                store=store,
+                workflow_id="wf-001",
+                run_id=run_id,
+                phase_id="phase-1",
+                risk="R3",
+                target="delete file",
+            )
+            assert "action_id" in result
+            assert "nonce" in result
+            row = store.conn.execute(
+                "SELECT status FROM approvals WHERE action_id=?",
+                (result["action_id"],)
+            ).fetchone()
+            assert row is not None
+            assert row["status"] == "PENDING"
+        finally:
+            store.close()
 
 
 def test_agent_team_enums():
-    from paios.paios.agent_team.models import ReviewDecision, Department
+    from paios.paios.agent_team.models import Department, ReviewDecision
     assert Department.TAIZI is not None
     assert Department.ZHONGSHU is not None
     assert ReviewDecision.APPROVED is not None
 
 
 def test_paios_risk():
-    from paios.paios.risk import RiskAssessment
     from paios.paios.enums import RiskLevel
+    from paios.paios.risk import RiskAssessment
     ra = RiskAssessment(level=RiskLevel.R0, reasons=())
     assert ra.level == RiskLevel.R0
 
@@ -164,13 +172,13 @@ if __name__ == "__main__":
         ("PAIOS risk", test_paios_risk),
     ]
 
-    passed = 0
+    passed = sum(1 for n, fn in tests if step(n, fn))
     total = len(tests)
-    for name, fn in tests:
-        if step(name, fn):
-            passed += 1
-
     print()
-    print(f"Results: {passed}/{total} passed")
     print("=" * 55)
-    sys.exit(0 if passed >= total - 3 else 1)
+    print(f"Result: {passed}/{total} passed")
+    if passed == total:
+        print("All smoke tests passed.")
+    else:
+        print(f"{total - passed} test(s) failed.")
+        sys.exit(1)

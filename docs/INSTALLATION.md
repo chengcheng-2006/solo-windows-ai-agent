@@ -1,164 +1,120 @@
-# Installation Guide
+# Installation Guide (v0.1.1 Lite)
 
-> **⚠️ Alpha Status**: Solo is currently in active development. Installation requires familiarity with Windows development tools. Expect rough edges.
+> 🚀 **Lite mode install — zero API keys, zero Docker, zero Node.js, zero GPU required.**
 
 ## System Requirements
 
-### Minimum
-- **OS**: Windows 10 22H2+ or Windows 11 (64-bit)
-- **CPU**: 4+ cores (x86-64)
-- **RAM**: 16 GB
-- **Storage**: 10 GB free on C: drive, 50 GB free on D: (or data drive)
-- **PowerShell**: 5.1+ (Windows built-in)
-- **Git**: 2.40+
-- **Node.js**: 18+ (LTS recommended)
+- **OS**: Windows 10/11, Linux, macOS
+- **Git**
 - **Python**: 3.11+
 
-### Recommended
-- **GPU**: NVIDIA with 4+ GB VRAM (for local LLM and vision models)
-- **RAM**: 32 GB
-- **Docker Desktop**: 4.30+ (for infrastructure services)
-- **Disc space**: 100+ GB free on data drive
-
-## Installation Steps
-
-### 1. Clone the Repository
+## Install from Source
 
 ```powershell
 git clone https://github.com/chengcheng-2006/solo-windows-ai-agent.git
 cd solo-windows-ai-agent
-```
-
-### 2. Set Up Python Environment
-
-```powershell
-python -m venv .venv
+py -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+py -m pip install --upgrade pip
+py -m pip install .
 ```
 
-### 3. Set Up Node.js Dependencies
+The `solo` CLI is immediately available after install:
 
 ```powershell
-npm install
-# or
-pnpm install
+solo doctor          # Environment health check
+solo demo safe       # Safe Demo: R0 end-to-end pipeline
+solo demo veto       # VETO Demo: R3 rejection demo
+solo version         # Show version
+solo cleanup         # Cleanup demo artifacts
 ```
 
-### 4. Configure API Keys
+## Developer Install
+
+For development (with test and build tools):
 
 ```powershell
-cp .env.example .env
-notepad .env
+py -m pip install -e ".[dev]"
 ```
 
-You need at least one LLM API key:
-- **DeepSeek API key** — For planning and review agents (recommended)
-- Or **OpenAI API key** — For Codex worker
-- Or set up **Ollama** for fully local operation (limited capability)
-
-### 5. Run Health Check
+## Run the Demos
 
 ```powershell
-.\scripts\doctor.ps1
+solo demo safe       # 8-step pipeline, real TaskStore + Risk + Policy + Approval + Validator
+solo demo veto       # R3 request -> rejected by safety system, 6 security guarantees verified
 ```
 
-The doctor script checks:
-- PowerShell version
-- Git availability
-- Python environment
-- Node.js environment
-- API key configuration
-- Disk space
-- Docker Desktop (optional)
-- Port availability
+Both demos run in **Lite mode** with no API keys required.
 
-### 6. Start Solo
+## Verify Installation
 
 ```powershell
-.\scripts\start.ps1
+solo doctor
 ```
 
-### 7. Verify Operation
+Expected output (Lite mode):
+```
+===== Result: 6 pass, 0 fail, 2 warn =====
+  Mode Report:
+    Requested:      auto
+    Active:         lite
+    Lite Readiness: Ready
+```
+
+## Future: PyPI Install
+
+After publication on PyPI:
 
 ```powershell
-.\scripts\test_smoke.ps1
+pip install solo-agent
 ```
 
-This runs a basic smoke test:
-- Gateway connectivity
-- Model routing
-- Agent availability
-
-## Optional: Infrastructure Services
-
-For full functionality (audit trail, event bus, dashboards), start Docker services:
+## Optional: Core Mode (add HTTP + browser)
 
 ```powershell
-cd infra
-docker compose up -d
+py -m pip install ".[core]"
 ```
 
-This starts:
-- PostgreSQL (task persistence)
-- NATS (event bus)
-- Temporal (workflow orchestration)
-- Prometheus + Grafana (monitoring)
-- Loki + Alloy (log aggregation)
+Enables:
+- HTTP client (httpx) for API calls
+- Playwright browser automation
 
-## Optional: Local Models
+## Optional: Full Mode (Docker infrastructure)
 
-### Ollama (for local text inference)
+Full mode requires:
+- Docker Desktop 4.30+
+- `docker compose` infrastructure (see `infra/`)
+- GPU with 4+ GB VRAM (for Computer Use worker)
+- API keys for LLM providers
 
-```powershell
-# Install Ollama
-winget install Ollama.Ollama
+## Lite vs Core vs Full
 
-# Pull a model
-ollama pull qwen2.5:7b
-```
+| Feature | Lite | Core | Full |
+|---------|------|------|------|
+| pip install | `solo-agent` (base) | `solo-agent[core]` | `solo-agent[full]` |
+| Demo pipelines | ✅ | ✅ | ✅ |
+| CLI (doctor/cleanup) | ✅ | ✅ | ✅ |
+| SQLite persistence | ✅ | ✅ | ✅ |
+| HTTP/API calls | ❌ | ✅ | ✅ |
+| Browser automation | ❌ | ✅ | ✅ |
+| Docker services | ❌ | ❌ | ✅ |
+| GPU Workers | ❌ | ❌ | ✅ |
+| API keys required | ❌ | ✅ (some features) | ✅ |
 
-### Faster-Whisper (for voice input)
+## Troubleshooting
 
-```powershell
-pip install faster-whisper
-# Download model: base or small for best speed/accuracy balance
-```
+See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues.
 
-## Stopping Solo
+---
 
-```powershell
-.\scripts\stop.ps1
-```
+## Legacy Installation (v0.1.0)
 
-## Uninstalling
+> The following instructions are for the v0.1.0 production deployment and are **DEPRECATED** in favor of the v0.1.1 Lite install above.
 
-```powershell
-.\scripts\uninstall.ps1
-```
-
-This stops services and removes the configuration directory.
-
-## Verification Checklist
-
-After installation:
-
-- [ ] `.\scripts\doctor.ps1` passes all checks
-- [ ] `.\scripts\start.ps1` starts without errors
-- [ ] `.\scripts\test_smoke.ps1` returns success
-- [ ] Gateway responds on 127.0.0.1:18789
-- [ ] Agent team responds to test messages
-
-## Supported Windows Versions
-
-| Version | Status |
-|---------|--------|
-| Windows 11 23H2+ | ✅ Tested |
-| Windows 10 22H2+ | ✅ Tested |
-| Windows Server 2022 | ❌ Not tested |
-| Windows on ARM | ❌ Not tested |
-| Wine / Linux | ❌ Not supported |
-
-## Common Issues
-
-See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for detailed solutions.
+### Old Requirements
+- Windows 10/11 (64-bit)
+- Python 3.11+
+- Node.js 18+
+- Git
+- PowerShell 5.1+
+- Docker Desktop 4.30+ (for infrastructure services)

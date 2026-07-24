@@ -287,7 +287,7 @@ SYMBOLIC_ALIASES = {
     "vision-router-model": {
         "executor": "openclaw_gateway",
         "provider": "zhipu",
-        "model": "zhipu/glm-4.6v-flash",
+        "model": "glm-4.7-flash",
         "auth_mode": "gateway_env",
         "credential_ref": "ZHIPU_API_KEY",
         "selected_layer": "vision_router",
@@ -655,7 +655,7 @@ class PAIOSCore:
             "zhipu": ProviderCapability(
                 provider="zhipu",
                 executor="openclaw_gateway",
-                model="zhipu/glm-4.6v-flash",
+                model="glm-4.7-flash",
                 configured=True,
                 runtime_available=True,
                 routing_enabled=True,

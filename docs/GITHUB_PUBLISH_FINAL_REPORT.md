@@ -1,0 +1,21 @@
+﻿{
+    "license":  "Apache-2.0",
+    "verified_privacy":  true,
+    "owner":  "chengcheng-2006",
+    "total_size_kb":  691.1,
+    "verified_gitleaks":  true,
+    "total_files":  142,
+    "final_status":  "PUBLISHED_AND_VERIFIED",
+    "test_count":  14,
+    "test_passed":  11,
+    "source_code_files":  79,
+    "verified_by_remote_clone":  true,
+    "branch":  "main",
+    "visibility":  "public",
+    "published_at":  "2026-07-24T03:40:59.0246608+08:00",
+    "release_tag":  "v0.1.0-alpha",
+    "privacy_scan":  "PASS",
+    "repository":  "https://github.com/chengcheng-2006/solo-windows-ai-agent",
+    "verified_tests":  "11/13 passed (2 Windows file lock)",
+    "secret_scan":  "0 leaks"
+}

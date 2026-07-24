@@ -9,6 +9,10 @@ Solo uses a layered configuration system:
 config/examples/                  # Example configuration files
 ```
 
+> ⚠️ **v0.1.1 Note:** The legacy `config/agent_team/` and `config/model-routing.json`
+> files referenced in previous documentation are not part of the public release.
+> See `docs/internal/ADR_002_PACKAGING_AND_CLI.md` for the CLI-based configuration.
+
 ## Environment Variables
 
 | Variable | Required | Description |
@@ -37,29 +41,17 @@ PAIOS_NATS_PASSWORD=YOUR_NATS_PASSWORD
 PAIOS_GRAFANA_PASSWORD=YOUR_GRAFANA_PASSWORD
 ```
 
-## Model Configuration
+## v0.1.1 Configuration (New)
 
-Model routing is defined in `config/model-routing.json`. See [ARCHITECTURE.md](ARCHITECTURE.md) for the routing topology.
+For v0.1.1, the recommended configuration is:
 
-The 4-level routing system:
-- **Level 1** (Local): Ollama Qwen 2.5 7B — free, fast, simple queries
-- **Level 2** (Free Cloud): DeepSeek Chat — knowledge, explanation
-- **Level 3** (Paid Fast): DeepSeek Flash — reasoning, code
-- **Level 4** (Paid Pro): DeepSeek Pro — complex decisions
+1. **Lite mode (default):** No configuration needed. `pip install solo-agent` and run.
+2. **Demo:** `solo demo safe` or `solo demo veto` — no API keys required.
+3. **Environment check:** `solo doctor` detects available capabilities.
+4. **Model routing:** Managed by PAIOS orchestrator; default model is `deepseek-v4-flash`.
 
-## Agent Team Configuration
-
-Agent roles and permissions are defined in `config/agent_team/`:
-
-| File | Purpose |
-|------|---------|
-| `agent_role_mapping.yaml` | Role definitions and tool permissions |
-| `permission_matrix.yaml` | Tool access matrix per agent |
-| `state_machine.yaml` | Agent workflow state machine |
-| `review.schema.json` | Review output format |
-| `memorial.schema.json` | Report output format |
-| `agents.schema.json` | Unified agent schema |
-
-## Port Configuration
-
-All service ports are defined in `config/runtime_ports.yaml` and bind to 127.0.0.1 only.
+For deployment mode override:
+```bash
+export SOLO_MODE=lite    # Force Lite mode
+export SOLO_MODE=core    # Force Core mode (requires httpx + playwright)
+```

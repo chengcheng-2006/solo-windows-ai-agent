@@ -53,9 +53,40 @@ Solo 是一个**面向 Windows 的个人 AI 系统**，通过多智能体流水�
 > **Alpha 版** — Solo 处于活跃开发阶段，已在作者机器上测试通过。
 > 它能工作，但可能有不完善之处。欢迎贡献！
 
-## 快速开始
+## 快速开始（v0.1.1 Lite）
 
 ### 前置条件
+
+- Git
+- Python 3.11+
+
+### 从源码安装
+
+```powershell
+git clone https://github.com/chengcheng-2006/solo-windows-ai-agent.git
+cd solo-windows-ai-agent
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+py -m pip install --upgrade pip
+py -m pip install .
+```
+
+### 运行 Demo（无需 API Key）
+
+```powershell
+solo demo safe    # R0 端到端管道：8 步
+solo demo veto    # R3 高风险请求被拒绝
+solo doctor       # 环境健康检查
+solo version      # 版本和模式信息
+```
+
+所有 Demo 在 **Lite 模式**下运行——零 API Key、零 Docker、零 Node.js、零 GPU。
+
+> 📦 **将来计划：** 发布到 PyPI 后可通过 `pip install solo-agent` 安装。
+
+---
+
+### 前置条件（v0.1.0 Legacy）
 
 - Windows 10/11（64 位）
 - PowerShell 5.1+
@@ -64,14 +95,14 @@ Solo 是一个**面向 Windows 的个人 AI 系统**，通过多智能体流水�
 - Git
 - （可选）Docker Desktop 用于基础设施服务
 
-### 1. 克隆并安装
+### 1. 克隆并安装（v0.1.0 Legacy）
 
 ```powershell
 git clone https://github.com/chengcheng-2006/solo-windows-ai-agent.git
 cd solo-windows-ai-agent
 ```
 
-### 2. 配置 API 密钥
+### 2. 配置 API 密钥（v0.1.0 Legacy）
 
 ```powershell
 cp .env.example .env
