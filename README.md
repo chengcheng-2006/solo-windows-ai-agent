@@ -78,7 +78,7 @@
 git clone https://github.com/chengcheng-2006/solo-windows-ai-agent.git
 cd solo-windows-ai-agent
 py -m venv .venv
-.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
 py -m pip install --upgrade pip
 py -m pip install .
 ```
