@@ -1,16 +1,5 @@
-"""Tests for state_machine module — all legal and illegal transitions."""
-import pytest
-
-from solo.core.state_machine import (
-    ALLOWED_TRANSITIONS,
-    TERMINAL_STATES,
-    can_transition,
-    require_transition,
-    InvalidTransition,
-)
-
-
-def test_can_transition_legal():
+﻿"""Tests for state_machine module �?all legal and illegal transitions."""
+import pytestfrom solo.core.state_machine import (    ALLOWED_TRANSITIONS,    TERMINAL_STATES,    InvalidTransitionError,    can_transition,    require_transition,)def test_can_transition_legal():
     assert can_transition("RECEIVED", "TRIAGED") is True
     assert can_transition("RECEIVED", "REJECTED") is True
     assert can_transition("TRIAGED", "PLANNING") is True
@@ -58,9 +47,9 @@ def test_require_transition_legal():
 
 
 def test_require_transition_illegal():
-    with pytest.raises(InvalidTransition):
+    with pytest.raises(InvalidTransitionError):
         require_transition("RECEIVED", "COMPLETED")
-    with pytest.raises(InvalidTransition):
+    with pytest.raises(InvalidTransitionError):
         require_transition("APPROVED", "REJECTED")
 
 

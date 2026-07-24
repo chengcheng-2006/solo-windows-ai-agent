@@ -5,6 +5,7 @@ Determines: allowed, requires_approval, and approval_scope.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+
 from .enums import RiskLevel
 
 

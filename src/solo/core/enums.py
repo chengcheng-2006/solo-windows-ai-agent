@@ -1,7 +1,7 @@
 """Enums for Solo v0.1.1 — task states, risk levels, approval states, deployment modes."""
 from __future__ import annotations
 
-from enum import Enum, auto
+from enum import Enum
 
 
 class TaskState(str, Enum):

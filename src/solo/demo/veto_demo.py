@@ -15,7 +15,6 @@ from ..core.risk import RiskClassifier
 from ..core.state_machine import can_transition
 from ..core.task_store import TaskStore
 
-
 R3_HAZARDOUS_REQUEST = "Delete all files in the important project directory"
 
 

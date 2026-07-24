@@ -22,7 +22,7 @@ def step(name, fn):
 
 
 def test_import_paios():
-    from paios.paios import config, enums, schemas, security, risk
+    from paios.paios import config, enums, schemas
     assert config is not None
     assert enums is not None
     assert schemas is not None
@@ -35,8 +35,8 @@ def test_paios_schemas():
 
 
 def test_paios_state_machine():
-    from paios.paios.state_machine import ALLOWED_TRANSITIONS, TERMINAL_STATES
     from paios.paios.enums import TaskState
+    from paios.paios.state_machine import ALLOWED_TRANSITIONS, TERMINAL_STATES
     assert len(TERMINAL_STATES) >= 2
     received = ALLOWED_TRANSITIONS.get(TaskState.RECEIVED, set())
     assert TaskState.CANCELLED in received
@@ -55,7 +55,7 @@ def test_paios_security():
 
 
 def test_orchestrator_imports():
-    from orchestrator.openclaw_night_workflow import config, schemas, state_machine
+    from orchestrator.openclaw_night_workflow import config
     from orchestrator.openclaw_night_workflow.schemas import utc_now
     assert config is not None
     assert callable(utc_now)
@@ -135,15 +135,15 @@ def test_orchestrator_approvals():
 
 
 def test_agent_team_enums():
-    from paios.paios.agent_team.models import ReviewDecision, Department
+    from paios.paios.agent_team.models import Department, ReviewDecision
     assert Department.TAIZI is not None
     assert Department.ZHONGSHU is not None
     assert ReviewDecision.APPROVED is not None
 
 
 def test_paios_risk():
-    from paios.paios.risk import RiskAssessment
     from paios.paios.enums import RiskLevel
+    from paios.paios.risk import RiskAssessment
     ra = RiskAssessment(level=RiskLevel.R0, reasons=())
     assert ra.level == RiskLevel.R0
 

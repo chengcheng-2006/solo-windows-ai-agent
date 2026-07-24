@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 import sqlite3
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -35,7 +35,7 @@ class TaskStore:
             self._conn.close()
             self._conn = None
 
-    def __enter__(self) -> "TaskStore":
+    def __enter__(self) -> TaskStore:
         self.connect()
         return self
 

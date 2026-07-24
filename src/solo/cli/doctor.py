@@ -100,7 +100,7 @@ def doctor(ctx, json_mode, check_models):
             "help": help_text,
         }, indent=2))
     else:
-        click.echo(f"\n===== Solo Doctor v0.1.1 =====")
+        click.echo("\n===== Solo Doctor v0.1.1 =====")
         click.echo("")
         for c in checks:
             icon = "✅" if c["status"] == "PASS" else ("❌" if c["status"] == "FAIL" else "⚠️")

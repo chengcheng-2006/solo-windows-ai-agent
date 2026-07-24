@@ -1,5 +1,4 @@
 """Tests for Safe Demo — 8-step pipeline end-to-end."""
-import pytest
 
 from solo.demo.safe_demo import run_safe_demo
 
@@ -42,7 +41,6 @@ def test_safe_demo_creates_evidence_manifest(tmp_path):
 
 
 def test_safe_demo_task_is_r0(tmp_path):
-    from solo.core.risk import RiskClassifier
     result = run_safe_demo(tmp_path)
     # The Safe Demo objective is "Count words in a test text file" → R0
     pipeline = result["pipeline"]
@@ -53,7 +51,6 @@ def test_safe_demo_task_is_r0(tmp_path):
 
 def test_safe_demo_no_api_keys(tmp_path):
     """Verify demo does not require API keys by checking env vars are unset."""
-    import os
     # This test runs without API keys being set
     result = run_safe_demo(tmp_path)
     assert result["status"] == "PASS"

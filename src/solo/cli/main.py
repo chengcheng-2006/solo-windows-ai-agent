@@ -47,10 +47,10 @@ def version() -> None:
 
 
 # Import and register subcommands
-from .doctor import doctor
-from .demo import demo
-from .test_cmd import test
 from .cleanup import cleanup
+from .demo import demo
+from .doctor import doctor
+from .test_cmd import test
 
 cli.add_command(doctor)
 cli.add_command(demo)

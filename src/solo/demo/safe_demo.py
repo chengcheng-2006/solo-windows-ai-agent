@@ -7,18 +7,14 @@ No API keys, no network, no Docker required.
 """
 from __future__ import annotations
 
-import json
 import uuid
 from pathlib import Path
 from typing import Any
 
-from ..core.approvals import create_approval, resolve_approval
-from ..core.evidence import sha256_file, export_file_manifest
-from ..core.enums import RiskLevel
+from ..core.evidence import export_file_manifest, sha256_file
 from ..core.policy import PolicyEngine
 from ..core.risk import RiskClassifier
-from ..core.schemas import PipelineEvent, ValidationResult, utc_now
-from ..core.state_machine import can_transition
+from ..core.schemas import utc_now
 from ..core.task_store import TaskStore
 from ..core.validator import validate_phase
 
@@ -75,7 +71,7 @@ def run_safe_demo(workspace: Path) -> dict[str, Any]:
         "risk_level": "R0",
     }
     store.transition_run(task_id, "PLANNING", payload={"plan": plan})
-    store.append_event(task_id, "PLANNING", detail=f"3-step plan generated")
+    store.append_event(task_id, "PLANNING", detail="3-step plan generated")
     events.append({"state": "PLANNING", "steps": 3})
 
     # Step 4: APPROVED — R0 auto-approved (skip REVIEW_PENDING)
@@ -132,7 +128,7 @@ def run_safe_demo(workspace: Path) -> dict[str, Any]:
     )
     store.transition_run(task_id, "VALIDATING")
     store.record_validation(validation.to_dict())
-    store.append_event(task_id, "VALIDATING", detail=f"4/4 checks passed")
+    store.append_event(task_id, "VALIDATING", detail="4/4 checks passed")
     events.append({"state": "VALIDATING", "result": "PASS"})
 
     # Step 8: COMPLETED

@@ -1,10 +1,9 @@
 """Approval engine — create and resolve approval requests with nonce-based verification."""
 from __future__ import annotations
 
-import hashlib
 import secrets
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from .task_store import TaskStore
@@ -17,7 +16,7 @@ def _generate_nonce() -> str:
 
 def _now_iso() -> str:
     """Current UTC time as ISO string."""
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def create_approval(
@@ -35,7 +34,7 @@ def create_approval(
     """
     action_id = f"act-{uuid.uuid4().hex[:12]}"
     nonce = _generate_nonce()
-    expires_at = (datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds)).isoformat()
+    expires_at = (datetime.now(UTC) + timedelta(seconds=ttl_seconds)).isoformat()
 
     store.create_approval_record(
         action_id=action_id,

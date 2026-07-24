@@ -5,8 +5,8 @@ Reuses the R3_TERMS / R2_TERMS / R1_TERMS taxonomy from PAIOS risk module.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from .enums import RiskLevel
 
+from .enums import RiskLevel
 
 # High-risk irreversible action terms (R3)
 R3_TERMS: tuple[str, ...] = (
@@ -54,19 +54,19 @@ class RiskClassifier:
         # Check R3 first (most restrictive)
         for term in R3_TERMS:
             if term in obj_lower:
-                reasons.append(f"high_risk_or_irreversible_action")
+                reasons.append("high_risk_or_irreversible_action")
                 return RiskAssessment(level=RiskLevel.R3, reasons=(tuple(reasons)))
 
         # Check R2
         for term in R2_TERMS:
             if term in obj_lower:
-                reasons.append(f"write_with_moderate_risk")
+                reasons.append("write_with_moderate_risk")
                 return RiskAssessment(level=RiskLevel.R2, reasons=(tuple(reasons)))
 
         # Check R1
         for term in R1_TERMS:
             if term in obj_lower:
-                reasons.append(f"read_with_minimal_side_effect")
+                reasons.append("read_with_minimal_side_effect")
                 return RiskAssessment(level=RiskLevel.R1, reasons=(tuple(reasons)))
 
         # Default: R0 — read-only or no side effects

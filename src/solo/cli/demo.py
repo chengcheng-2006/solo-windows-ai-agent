@@ -1,7 +1,6 @@
 """solo demo — Demo subcommand group (safe, veto)."""
 from __future__ import annotations
 
-import json as _json
 import tempfile
 import time
 from pathlib import Path
@@ -10,7 +9,7 @@ import click
 
 from ..demo.formatter import format_demo_human, format_demo_json
 from ..demo.safe_demo import run_safe_demo
-from ..demo.veto_demo import run_veto_demo, R3_HAZARDOUS_REQUEST
+from ..demo.veto_demo import R3_HAZARDOUS_REQUEST, run_veto_demo
 
 
 @click.group()

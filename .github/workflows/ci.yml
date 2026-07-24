@@ -2,79 +2,167 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, "release/**"]
   pull_request:
     branches: [main]
 
 jobs:
-  lint:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Check YAML formatting
-        shell: pwsh
-        run: |
-          $errors = 0
-          Get-ChildItem -Recurse -Filter "*.yaml","*.yml" |
-            Where-Object { $_.FullName -notmatch "node_modules|\.venv|__pycache__|\.git" } |
-            ForEach-Object {
-              try { ConvertFrom-Yaml (Get-Content $_.FullName -Raw) -ErrorAction Stop | Out-Null }
-              catch { Write-Warning "Invalid YAML: $($_.Name)"; $errors++ }
-            }
-          if ($errors -gt 0) { throw "$errors YAML files have syntax errors" }
 
-  python-checks:
+  # ────────────────────────────────────────────────────────────
+  # Job 1: Tests — real pytest, coverage, lint
+  # ────────────────────────────────────────────────────────────
+  tests:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      
+          python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -r requirements-dev.txt 2>$null
-          pip install pytest pyyaml
-      
-      - name: Python syntax check
-        shell: pwsh
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Lint with ruff
         run: |
-          $errors = 0
-          Get-ChildItem -Recurse -Filter "*.py" |
-            Where-Object { $_.FullName -notmatch "node_modules|\.venv|__pycache__|\.git|hermes-agent" } |
-            ForEach-Object {
-              try { python -m py_compile $_.FullName 2>&1 | Out-Null }
-              catch { Write-Warning "Syntax error in: $($_.FullName)"; $errors++ }
-            }
-          if ($errors -gt 0) { throw "$errors Python files have syntax errors" }
+          python -m ruff check src tests
+      - name: Test with pytest and coverage
+        run: |
+          python -m pytest --cov=solo --cov-report=term-missing --cov-fail-under=90 -q
 
+  # ────────────────────────────────────────────────────────────
+  # Job 2: Package — wheel build and clean-room install
+  # ────────────────────────────────────────────────────────────
+  package:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build
+      - name: Build wheel
+        run: |
+          python -m build
+      - name: Create clean venv and install from wheel
+        run: |
+          python -m venv _clean_venv
+          .\_clean_venv\Scripts\Activate.ps1
+          python -m pip install --upgrade pip
+          Get-ChildItem .\dist\*.whl | Select-Object -First 1 | ForEach-Object {
+            python -m pip install $_.FullName
+          }
+          # Clean-room verification (no API keys)
+          $env:DEEPSEEK_API_KEY=""
+          $env:SOLO_MODE="lite"
+          python -c "from click.testing import CliRunner; from solo.cli.main import cli; import json, tempfile; r=CliRunner()
+          v=json.loads(r.invoke(cli,['version']).output or '\"solo-agent\"')
+          d=json.loads(r.invoke(cli,['doctor','--json']).output)
+          m=d['mode_report']
+          assert m['active_mode']=='lite', f'Expected lite got {m[\"active_mode\"]}'
+          assert m['model_credentials']['any_configured']==False
+          print('Clean-room: version OK, active=lite, creds=none')
+          with tempfile.TemporaryDirectory() as t:
+            sd=json.loads(r.invoke(cli,['demo','safe','--json','--workspace',t]).output)
+            assert sd['status']=='PASS'
+            print(f'Safe: {sd[\"status\"]}, {sd[\"duration_ms\"]}ms')
+            vd=json.loads(r.invoke(cli,['demo','veto','--json','--workspace',t]).output)
+            assert vd['status']=='PASS'
+            assert vd['vetoed']==True
+            print(f'VETO: {vd[\"status\"]}, vetoed={vd[\"vetoed\"]}, {vd[\"duration_ms\"]}ms')
+          cl=json.loads(r.invoke(cli,['cleanup','--json']).output)
+          print(f'Cleanup: OK')"
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: solo-agent-wheel
+          path: dist/*.whl
+
+  # ────────────────────────────────────────────────────────────
+  # Job 3: Ruff linting (standalone, also runs inside tests)
+  # ────────────────────────────────────────────────────────────
+  ruff:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install ruff
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ruff
+      - name: Run ruff check
+        run: |
+          python -m ruff check src/solo tests
+
+  # ────────────────────────────────────────────────────────────
+  # Job 4: YAML validation (Python-based, strict)
+  # ────────────────────────────────────────────────────────────
+  yaml:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install PyYAML
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyyaml
+      - name: Validate YAML files
+        run: |
+          python scripts/ci/validate_yaml.py
+
+  # ────────────────────────────────────────────────────────────
+  # Job 5: Documentation contract
+  # ────────────────────────────────────────────────────────────
+  docs-contract:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate docs
+        run: |
+          python scripts/ci/validate_docs.py
+
+  # ────────────────────────────────────────────────────────────
+  # Job 6: Secret scan (Gitleaks v3 with full history)
+  # ────────────────────────────────────────────────────────────
   secret-scan:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      
+        with:
+          fetch-depth: 0
       - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         with:
           config-path: .gitleaks.toml
 
-  docs-links:
+  # ────────────────────────────────────────────────────────────
+  # Job 7: Model contract (banned model reference scan)
+  # ────────────────────────────────────────────────────────────
+  model-contract:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Check documentation links
-        shell: pwsh
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run model contract validator
         run: |
-          $errors = 0
-          Get-ChildItem -Recurse -Filter "*.md" -Exclude "node_modules","\.venv" |
-            Select-String -Pattern "\[.*\]\(.*\.md\)" |
-            ForEach-Object {
-              $link = ($_ -replace '.*\(([^)]+\.md)\).*', '$1')
-              if ($link -and -not (Test-Path (Join-Path $PSScriptRoot $link))) {
-                Write-Warning "Broken link: $link in $($_.Path)"
-                $errors++
-              }
-            }
-          if ($errors -gt 0) { Write-Warning "$errors broken documentation links found, but not failing build" }
+          python scripts/ci/validate_model_contract.py

@@ -1,5 +1,6 @@
 """Tests for CLI commands using Click CliRunner."""
 import json
+
 import pytest
 from click.testing import CliRunner
 

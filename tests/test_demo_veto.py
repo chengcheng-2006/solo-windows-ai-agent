@@ -1,5 +1,4 @@
 """Tests for VETO Demo — R3 rejected pipeline with security guarantees."""
-import pytest
 
 from solo.demo.veto_demo import run_veto_demo
 
@@ -44,7 +43,6 @@ def test_veto_demo_six_guarantees(tmp_path):
 def test_veto_demo_no_execution(tmp_path):
     """Verify VETO demo has zero execution attempts."""
     import sqlite3
-    from pathlib import Path
 
     run_veto_demo(tmp_path)
     conn = sqlite3.connect(str(tmp_path / "demo.db"))

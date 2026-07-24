@@ -1,6 +1,6 @@
 """Tests for TaskStore — CRUD, state transitions, events, execution attempts."""
+
 import pytest
-from pathlib import Path
 
 from solo.core.task_store import TaskStore
 
