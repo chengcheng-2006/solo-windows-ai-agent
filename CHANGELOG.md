@@ -19,6 +19,33 @@
 - 4-level model routing
 - Memory bridge (OpenClaw ↔ Hermes sync)
 
+## [0.2.0-alpha] - 2026-08-16
+
+### Added
+- Native DeepSeek Harness runtime integration via an optional OpenClaw plugin.
+- Model-scoped runtime profiles for DeepSeek V4 Flash (`dsh-flash-router`) and
+  DeepSeek V4 Pro (`dsh-pro-anchored`).
+- DSH session persistence and resume.
+- Runtime status diagnostics (`/runtime-status`).
+- Cancellation and timeout handling.
+- Disable and rollback controls.
+- Offline unit tests for the plugin, plus optional live DSH integration tests.
+
+### Changed
+- DeepSeek V4 execution can now delegate to experimental DSH profiles when the
+  bridge is enabled. All other models keep OpenClaw's native runtime.
+
+### Security
+- Runtime credentials remain outside public configuration.
+- Added secret sanitization in bridge errors/logs and repo-level secret scan
+  coverage.
+
+### Known limitations
+- Image attachment bridge is currently unsupported.
+- Event mapping is currently polling-based.
+- DSH rc API and experimental presets may change.
+- Session hard deletion may be unavailable in DSH 0.1.0-rc.6.
+
 ## [0.1.0-alpha] - YYYY-MM-DD
 
 ### Added

@@ -35,6 +35,7 @@
 | Capability | Status | How to verify |
 |-----------|--------|---------------|
 | Task orchestration engine | ✅ Public | `tests/test_core.py` — 14 tests, 11+ pass |
+| Native DeepSeek Harness Runtime (optional) | 🟡 Experimental | `plugins/openclaw-dsh-runtime/` — Flash → Router Standard, Pro → Anchored Standard |
 | State machine (task lifecycle) | ✅ Public | `src/paios/paios/state_machine.py` |
 | Approval model (create, review, approve) | ✅ Public | `src/orchestrator/openclaw_night_workflow/approvals.py` |
 | Audit trail (evidence, file manifest) | ✅ Public | `src/orchestrator/openclaw_night_workflow/evidence.py` |
@@ -63,6 +64,45 @@
 | Computer Use with real mouse/keyboard | Risk of unintended system changes |
 | Privacy broker | Contains personal data redaction patterns |
 | STT (Faster-Whisper) | Requires model download; not tested on new machines |
+
+## Native DeepSeek Harness Runtime
+
+> **Experimental.** This is an optional integration. Without DSH, or with the
+> bridge disabled, DeepSeek models continue to use OpenClaw's native runtime.
+
+The plugin adds optional native DeepSeek Harness execution profiles:
+
+```text
+OpenClaw
+   │
+   ├─ DeepSeek V4 Flash
+   │      ↓
+   │   DSH Runtime
+   │      ↓
+   │   Router Standard (experimental)
+   │
+   ├─ DeepSeek V4 Pro
+   │      ↓
+   │   DSH Runtime
+   │      ↓
+   │   Anchored Standard (experimental)
+   │
+   └─ Other Models
+          ↓
+       Native Runtime
+```
+
+- **Flash** can use the experimental `router-standard` profile.
+- **Pro** can use the experimental `anchored-standard` profile.
+- DSH owns DeepSeek prompt assembly, tool schemas, tool execution, and the tool
+  loop. OpenClaw owns orchestration, model selection, sessions, and delivery.
+- `/runtime-status` reports bridge health, profiles, and persisted DSH session
+  mappings.
+- The bridge is fail-closed: missing DSH, missing presets, or unavailable
+  credentials produce clear errors instead of crashing OpenClaw.
+
+See [plugins/openclaw-dsh-runtime/README.md](plugins/openclaw-dsh-runtime/README.md)
+for installation, configuration, disable/rollback, and known limitations.
 
 ## Quick Start
 
@@ -159,6 +199,7 @@ flowchart LR
 | Doc | Description |
 |-----|-------------|
 | [Architecture](docs/ARCHITECTURE.md) | System architecture and component overview |
+| [Native DSH Runtime](plugins/openclaw-dsh-runtime/README.md) | Optional DeepSeek Harness integration |
 | [Installation](docs/INSTALLATION.md) | Detailed installation guide |
 | [Security Model](docs/SECURITY_MODEL.md) | How Solo keeps your system safe |
 | [FAQ](docs/FAQ.md) | Frequently asked questions |

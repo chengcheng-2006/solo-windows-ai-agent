@@ -1,0 +1,23 @@
+{
+  "name": "openclaw-dsh-runtime",
+  "version": "0.1.0",
+  "description": "OpenClaw native Agent Harness bridge that delegates DeepSeek V4 Flash/Pro turns to the real DeepSeek Harness runtime (DSH owns the tool loop).",
+  "type": "module",
+  "private": true,
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "openclaw": ">=2026.7.1"
+  },
+  "devDependencies": {
+    "openclaw": "2026.7.1"
+  },
+  "scripts": {
+    "test": "node --test tests/unit/bridge-run.test.mjs tests/unit/dsh-client.test.mjs tests/unit/runtime-status.test.mjs tests/unit/session-store.test.mjs",
+    "test:integration": "node --test tests/integration/dsh-rpc.test.mjs"
+  },
+  "openclaw": {
+    "extensions": [
+      "./dist/index.js"
+    ]
+  }
+}

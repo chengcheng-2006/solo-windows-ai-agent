@@ -1,0 +1,60 @@
+{
+  "id": "openclaw-dsh-runtime",
+  "name": "DeepSeek Harness Runtime Bridge",
+  "description": "Delegates DeepSeek V4 Flash/Pro agent turns to the real DeepSeek Harness (DSH) runtime. OpenClaw owns orchestration; DSH owns DeepSeek execution.",
+  "version": "0.1.0",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": { "type": "boolean", "default": true },
+      "dshBaseUrl": { "type": "string", "default": "http://127.0.0.1:3081" },
+      "stateDir": { "type": "string" },
+      "logDir": { "type": "string" },
+      "contextTransferPolicy": { "type": "string", "enum": ["minimal", "selected", "full"], "default": "selected" },
+      "fallbackOnRuntimeFailure": { "type": "string", "enum": ["fail", "native"], "default": "fail" },
+      "profiles": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "flash": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "harnessId": { "type": "string", "default": "dsh-flash-router" },
+              "model": { "type": "string", "default": "deepseek-v4-flash" },
+              "presetId": { "type": "string", "default": "router-standard" },
+              "reasoningEffort": { "type": "string", "enum": ["off", "high", "max"], "default": "max" },
+              "status": { "type": "string", "default": "experimental" }
+            }
+          },
+          "pro": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "harnessId": { "type": "string", "default": "dsh-pro-anchored" },
+              "model": { "type": "string", "default": "deepseek-v4-pro" },
+              "presetId": { "type": "string", "default": "anchored-standard" },
+              "reasoningEffort": { "type": "string", "enum": ["off", "high", "max"], "default": "max" },
+              "status": { "type": "string", "default": "experimental" }
+            }
+          }
+        },
+        "required": ["flash", "pro"]
+      },
+      "timeouts": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "startupMs": { "type": "number", "minimum": 1000, "default": 30000 },
+          "executionMs": { "type": "number", "minimum": 1000, "default": 1800000 },
+          "idleMs": { "type": "number", "minimum": 1000, "default": 300000 },
+          "shutdownMs": { "type": "number", "minimum": 500, "default": 10000 }
+        }
+      }
+    }
+  },
+  "activation": {
+    "onStartup": true
+  }
+}
