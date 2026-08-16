@@ -1,0 +1,28 @@
+{
+  "enabled": true,
+  "dshBaseUrl": "http://127.0.0.1:3081",
+  "contextTransferPolicy": "selected",
+  "fallbackOnRuntimeFailure": "fail",
+  "profiles": {
+    "flash": {
+      "harnessId": "dsh-flash-router",
+      "model": "deepseek-v4-flash",
+      "presetId": "router-standard",
+      "reasoningEffort": "max",
+      "status": "experimental"
+    },
+    "pro": {
+      "harnessId": "dsh-pro-anchored",
+      "model": "deepseek-v4-pro",
+      "presetId": "anchored-standard",
+      "reasoningEffort": "max",
+      "status": "experimental"
+    }
+  },
+  "timeouts": {
+    "startupMs": 30000,
+    "executionMs": 1800000,
+    "idleMs": 300000,
+    "shutdownMs": 10000
+  }
+}
