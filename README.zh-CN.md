@@ -53,6 +53,44 @@ Solo 是一个**面向 Windows 的个人 AI 系统**，通过多智能体流水�
 > **Alpha 版** — Solo 处于活跃开发阶段，已在作者机器上测试通过。
 > 它能工作，但可能有不完善之处。欢迎贡献！
 
+## 原生 DeepSeek Harness Runtime（实验性）
+
+> **实验性功能。** 这是可选集成。未安装 DSH 或未启用 Bridge 时，
+> DeepSeek 模型继续使用 OpenClaw 原生 runtime。
+
+该插件为 DeepSeek V4 Flash 和 V4 Pro 添加可选的 DSH 执行配置：
+
+```text
+OpenClaw
+   │
+   ├─ DeepSeek V4 Flash
+   │      ↓
+   │   DSH Runtime
+   │      ↓
+   │   Router Standard（实验性）
+   │
+   ├─ DeepSeek V4 Pro
+   │      ↓
+   │   DSH Runtime
+   │      ↓
+   │   Anchored Standard（实验性）
+   │
+   └─ 其他模型
+          ↓
+       Native Runtime
+```
+
+- **Flash** 可使用实验性 `router-standard` 配置。
+- **Pro** 可使用实验性 `anchored-standard` 配置。
+- DSH 负责 DeepSeek 的 prompt 组装、工具 schema、工具执行和工具循环；
+  OpenClaw 负责编排、模型选择、会话和消息投递。
+- `/runtime-status` 可查看 Bridge 健康状态、配置和 DSH 会话映射。
+- Bridge 默认 fail-closed：DSH 缺失、preset 缺失或凭据不可用时返回清晰错误，
+  不会导致 OpenClaw 整体崩溃。
+
+安装、配置、禁用/回滚和已知限制请见
+[plugins/openclaw-dsh-runtime/README.md](plugins/openclaw-dsh-runtime/README.md)。
+
 ## 快速开始
 
 ### 前置条件

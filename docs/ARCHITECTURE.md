@@ -141,6 +141,30 @@ flowchart LR
   PRO --> RESP
 ```
 
+### 7.1 Native DeepSeek Harness Runtime (optional, experimental)
+
+The optional `openclaw-dsh-runtime` plugin lets DeepSeek V4 Flash and V4 Pro
+delegate their turns to a real DeepSeek Harness (DSH) runtime.
+
+```mermaid
+flowchart LR
+  OC[OpenClaw Gateway] --> R{Model-scoped runtime policy}
+  R -- deepseek/deepseek-v4-flash --> F[DSH Runtime]
+  R -- deepseek/deepseek-v4-pro --> P[DSH Runtime]
+  R -- other models --> N[Native OpenClaw Runtime]
+  F --> FR[Router Standard - experimental]
+  P --> PA[Anchored Standard - experimental]
+```
+
+- DSH owns DeepSeek prompt assembly, tool schemas, tool execution, and the tool
+  loop.
+- OpenClaw owns model selection, session orchestration, channels, and delivery.
+- DSH session mappings persist locally and are resumed across OpenClaw turns.
+- Missing DSH, presets, or credentials fail closed with explicit error codes
+  (`DSH_NOT_FOUND`, `PRESET_NOT_FOUND`, `CREDENTIAL_ERROR`, etc.).
+- The bridge is not a DSH clone and does not re-implement DSH behavior in
+  OpenClaw.
+
 ### 8. Approval Flow
 
 ```mermaid

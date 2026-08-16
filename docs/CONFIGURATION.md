@@ -60,6 +60,64 @@ Agent roles and permissions are defined in `config/agent_team/`:
 | `memorial.schema.json` | Report output format |
 | `agents.schema.json` | Unified agent schema |
 
+## Native DeepSeek Harness Runtime (Optional)
+
+The `openclaw-dsh-runtime` plugin is optional. When enabled, it maps:
+
+- `deepseek/deepseek-v4-flash` → `dsh-flash-router` → DSH preset `router-standard`
+- `deepseek/deepseek-v4-pro` → `dsh-pro-anchored` → DSH preset `anchored-standard`
+
+Both profiles are **experimental**. All other models keep OpenClaw's native
+runtime.
+
+The helper script applies the OpenClaw-side model policy:
+
+```powershell
+python plugins/openclaw-dsh-runtime/scripts/apply_bridge_config.py
+```
+
+Plugin configuration example:
+
+```json
+{
+  "enabled": true,
+  "dshBaseUrl": "http://127.0.0.1:3081",
+  "contextTransferPolicy": "selected",
+  "fallbackOnRuntimeFailure": "fail",
+  "profiles": {
+    "flash": {
+      "harnessId": "dsh-flash-router",
+      "model": "deepseek-v4-flash",
+      "presetId": "router-standard",
+      "reasoningEffort": "max",
+      "status": "experimental"
+    },
+    "pro": {
+      "harnessId": "dsh-pro-anchored",
+      "model": "deepseek-v4-pro",
+      "presetId": "anchored-standard",
+      "reasoningEffort": "max",
+      "status": "experimental"
+    }
+  },
+  "timeouts": {
+    "startupMs": 30000,
+    "executionMs": 1800000,
+    "idleMs": 300000,
+    "shutdownMs": 10000
+  }
+}
+```
+
+To disable:
+
+```powershell
+python plugins/openclaw-dsh-runtime/scripts/disable_bridge.py
+```
+
+See [plugins/openclaw-dsh-runtime/README.md](../plugins/openclaw-dsh-runtime/README.md)
+for full details.
+
 ## Port Configuration
 
 All service ports are defined in `config/runtime_ports.yaml` and bind to 127.0.0.1 only.

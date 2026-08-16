@@ -12,7 +12,7 @@ Solo uses the following third-party components and dependencies.
 - **Modifications**: Configuration profiles and integration adapters
 
 ### OpenClaw
-- **License**: Proprietary / Apache-2.0
+- **License**: MIT
 - **Source**: https://github.com/openclaw/openclaw
 - **Used as**: Message gateway and tool execution engine
 
@@ -52,6 +52,18 @@ Solo uses the following third-party components and dependencies.
 | grafana/grafana:12.0.2 | AGPL-3.0 | Dashboards |
 | grafana/loki:3.5.0 | AGPL-3.0 | Log aggregation |
 | grafana/alloy:v1.16.1 | AGPL-3.0 | Log shipping |
+
+## External Runtime Tools (not bundled)
+
+The optional `openclaw-dsh-runtime` plugin calls these external tools over
+DSH's loopback RPC interface. They are not vendored or copied into this
+repository.
+
+| Tool | License | Purpose | Source |
+|------|---------|---------|--------|
+| DeepSeek Harness (`@deepseek-ai/dsh`) | MIT | DeepSeek-native runtime | npm / DSH project |
+| Anchored Standard preset | MIT | Experimental DSH preset for DeepSeek V4 Pro | https://github.com/xiaobright/dsh-anchored-standard |
+| Router Standard preset | MIT | Experimental DSH preset for DeepSeek V4 Flash | https://github.com/yjh051108/dsh-router-standard |
 
 ## Icon / Logo / Font
 

@@ -125,6 +125,55 @@ pip install faster-whisper
 # Download model: base or small for best speed/accuracy balance
 ```
 
+## Optional: Native DeepSeek Harness Runtime
+
+> **Experimental.** This is optional. Without DSH, DeepSeek models keep
+> OpenClaw's native runtime.
+
+Requirements:
+
+- OpenClaw `>= 2026.7.1`
+- DeepSeek Harness (`@deepseek-ai/dsh`) `0.1.0-rc.6` or compatible
+- DSH presets installed:
+  - `router-standard` (experimental)
+  - `anchored-standard` (experimental)
+- DeepSeek credentials configured in the DSH credential store
+
+Install:
+
+```powershell
+python plugins/openclaw-dsh-runtime/scripts/apply_bridge_config.py
+openclaw gateway restart --force
+```
+
+Verify with:
+
+```
+/runtime-status
+```
+
+Run offline plugin tests:
+
+```powershell
+cd plugins/openclaw-dsh-runtime
+npm ci --no-audit --no-fund
+npm test
+```
+
+Disable:
+
+```powershell
+python plugins/openclaw-dsh-runtime/scripts/disable_bridge.py
+openclaw gateway restart --force
+```
+
+Roll back:
+
+```powershell
+python plugins/openclaw-dsh-runtime/scripts/rollback_bridge.py --backup C:\path\to\backup.json
+openclaw gateway restart --force
+```
+
 ## Stopping Solo
 
 ```powershell
