@@ -49,6 +49,22 @@ jobs:
             }
           if ($errors -gt 0) { throw "$errors Python files have syntax errors" }
 
+  dsh-plugin-tests:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      
+      - name: Install OpenClaw DSH runtime plugin dependencies
+        working-directory: plugins/openclaw-dsh-runtime
+        run: npm ci --no-audit --no-fund
+      
+      - name: Run offline DSH runtime plugin unit tests
+        working-directory: plugins/openclaw-dsh-runtime
+        run: npm test
+
   secret-scan:
     runs-on: windows-latest
     steps:
