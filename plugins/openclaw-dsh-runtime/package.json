@@ -12,8 +12,8 @@
     "openclaw": "2026.7.1"
   },
   "scripts": {
-    "test": "node --test \"tests/unit/*.test.mjs\"",
-    "test:integration": "node --test \"tests/integration/*.test.mjs\""
+    "test": "node --test tests/unit/bridge-run.test.mjs tests/unit/dsh-client.test.mjs tests/unit/runtime-status.test.mjs tests/unit/session-store.test.mjs",
+    "test:integration": "node --test tests/integration/dsh-rpc.test.mjs"
   },
   "openclaw": {
     "extensions": [

@@ -16,8 +16,8 @@ jobs:
         shell: pwsh
         run: |
           $errors = 0
-          Get-ChildItem -Recurse -Filter "*.yaml","*.yml" |
-            Where-Object { $_.FullName -notmatch "node_modules|\.venv|__pycache__|\.git" } |
+          Get-ChildItem -Recurse -File |
+            Where-Object { $_.FullName -notmatch "node_modules|\.venv|__pycache__|\.git" -and $_.Extension -in ".yaml",".yml" } |
             ForEach-Object {
               try { ConvertFrom-Yaml (Get-Content $_.FullName -Raw) -ErrorAction Stop | Out-Null }
               catch { Write-Warning "Invalid YAML: $($_.Name)"; $errors++ }
@@ -71,9 +71,9 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
-        with:
-          config-path: .gitleaks.toml
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITLEAKS_CONFIG: .gitleaks.toml
 
   docs-links:
     runs-on: windows-latest
